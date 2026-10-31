@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <!-- Placeholder modal background. Flat only: no gradients, no filters.
+       Colours mirror the palette tokens in src/index.css (an external SVG
+       cannot read CSS variables). -->
+  <rect width="600" height="800" fill="#3E2419" />
+
+  <!-- radio dial ticks -->
+  <g stroke="#5A3A2C" stroke-width="2">
+    <line x1="120" y1="640" x2="120" y2="668" />
+    <line x1="160" y1="640" x2="160" y2="676" />
+    <line x1="200" y1="640" x2="200" y2="668" />
+    <line x1="240" y1="640" x2="240" y2="676" />
+    <line x1="280" y1="640" x2="280" y2="668" />
+    <line x1="320" y1="640" x2="320" y2="676" />
+    <line x1="360" y1="640" x2="360" y2="668" />
+    <line x1="400" y1="640" x2="400" y2="676" />
+    <line x1="440" y1="640" x2="440" y2="668" />
+    <line x1="480" y1="640" x2="480" y2="676" />
+  </g>
+  <line x1="100" y1="640" x2="500" y2="640" stroke="#5A3A2C" stroke-width="2" />
+
+  <!-- needle -->
+  <line x1="352" y1="640" x2="352" y2="700" stroke="#D9482F" stroke-width="3" />
+
+  <!-- one coral marker -->
+  <circle cx="352" cy="716" r="7" fill="#F2A58F" />
+</svg>

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/site/layout'
+import { useAuthModal } from '@/components/auth/AuthModalProvider'
 
 const LINKS = [
   { href: '#how-it-works', label: 'How it works' },
@@ -10,6 +11,8 @@ const LINKS = [
 ]
 
 export function SiteHeader() {
+  const { openAuthModal } = useAuthModal()
+
   return (
     <header className="sticky top-0 z-40 border-b border-sand-300 bg-cream-100/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-6">
@@ -32,7 +35,11 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Button className="h-11 rounded-md bg-green-700 px-4 text-sm font-semibold text-cream-50">
+        <Button
+          type="button"
+          onClick={() => openAuthModal('login')}
+          className="h-11 rounded-md bg-green-700 px-4 text-sm font-semibold text-cream-50"
+        >
           Login / Sign up
         </Button>
       </Container>

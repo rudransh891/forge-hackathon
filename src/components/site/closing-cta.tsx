@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
+import { useAuthModal } from '@/components/auth/AuthModalProvider'
 
 export function ClosingCta() {
+  const { openAuthModal } = useAuthModal()
+
   return (
     <section
       id="about"
@@ -31,7 +34,11 @@ export function ClosingCta() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button className="h-12 rounded-md bg-coral-300 px-6 text-[15px] font-semibold text-brown-900 hover:bg-cream-100 hover:text-brown-900">
+          <Button
+            type="button"
+            onClick={() => openAuthModal('signup')}
+            className="h-12 rounded-md bg-coral-300 px-6 text-[15px] font-semibold text-brown-900 hover:bg-cream-100 hover:text-brown-900"
+          >
             Create free account
           </Button>
           <Button

@@ -66,6 +66,7 @@
   --status-urgent: var(--color-coral-700);
   --border-subtle: var(--color-cream-300);
   --focus-ring: var(--color-teal-400);
+  --overlay-scrim: rgba(43, 24, 16, 0.72);
 
   /* Shape and space */
   --radius-pill: 0px;
