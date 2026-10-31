@@ -124,7 +124,11 @@ export function TrendingIssues() {
         </ul>
 
         <Button
+          type="button"
           variant="outline"
+          onClick={() => {
+            window.location.hash = '#/issues'
+          }}
           className="mt-10 h-12 border border-coral-300 bg-transparent px-5 text-[15px] font-semibold text-coral-300 hover:bg-coral-300 hover:text-brown-900"
         >
           Browse all issues

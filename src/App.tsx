@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { SiteHeader } from '@/components/site/site-header'
 import { Hero } from '@/components/site/hero'
 import { PulseStrip } from '@/components/site/pulse-strip'
@@ -9,8 +10,27 @@ import { ClosingCta } from '@/components/site/closing-cta'
 import { SiteFooter } from '@/components/site/site-footer'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { AuthModalProvider } from '@/components/auth/AuthModalProvider'
+import { FeedPage } from '@/components/feed/FeedPage'
 
+/**
+ * No router in this project: the feed is mounted from the URL hash so the
+ * landing page stays a single static page and nothing new is installed.
+ * "#/issues" -> feed, anything else -> landing.
+ */
 function App() {
+  const [hash, setHash] = useState(() => window.location.hash)
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setHash(window.location.hash)
+      window.scrollTo(0, 0)
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  const showFeed = hash === '#/issues'
+
   return (
     <AuthModalProvider>
       {/* Newsprint texture, below every other element. Sections that sit on the
@@ -28,15 +48,19 @@ function App() {
 
       <SiteHeader />
 
-      <main id="top">
-        <Hero />
-        <PulseStrip />
-        <TrendingIssues />
-        <HowItWorks />
-        <FeaturedPoll />
-        <Faq />
-        <ClosingCta />
-      </main>
+      {showFeed ? (
+        <FeedPage />
+      ) : (
+        <main id="top">
+          <Hero />
+          <PulseStrip />
+          <TrendingIssues />
+          <HowItWorks />
+          <FeaturedPoll />
+          <Faq />
+          <ClosingCta />
+        </main>
+      )}
 
       <SiteFooter />
 

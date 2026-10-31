@@ -223,3 +223,42 @@
     scrollbar-color: var(--color-brown-700) var(--color-cream-100);
   }
 }
+
+/* ---------------------------------------------------------------
+   Feed: notices ticker and the chip scroller.
+--------------------------------------------------------------- */
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+}
+
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track,
+.ticker-track[data-paused='true'] {
+  animation-play-state: paused;
+}
+
+.ticker-strip {
+  scrollbar-width: none;
+}
+
+.ticker-strip::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+  .ticker > div {
+    overflow-x: auto;
+  }
+}
