@@ -55,7 +55,7 @@ function SeveritySection({ report, onReanalyse, busy }) {
 
   if (!severity) {
     return (
-      <section aria-labelledby="severity-heading" className="mt-6 bg-cream-50 p-4">
+      <section aria-labelledby="severity-heading" className="mt-6 border-t border-sand-300 pt-4">
         <SectionHeading id="severity-heading">Severity</SectionHeading>
         <p className="mt-1 text-[14px] text-brown-600">
           Not scored yet. A score needs a readable photo, and the road and nearby
@@ -70,23 +70,47 @@ function SeveritySection({ report, onReanalyse, busy }) {
   const level = severity.level ? severity.level.charAt(0).toUpperCase() + severity.level.slice(1) : 'Unscored'
 
   return (
-    <section aria-labelledby="severity-heading" className="mt-6 bg-cream-50 p-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
+    <section aria-labelledby="severity-heading" className="mt-6 border-t border-sand-300 pt-4">
+      <div className="flex items-baseline justify-between gap-3">
         <SectionHeading id="severity-heading">Severity</SectionHeading>
-        <p className="font-mono text-[13px] text-brown-600">
-          {severity.score ?? '—'}/100 · {severity.coverage ?? 'partial'}
+        <p className="font-mono text-[12px] text-brown-600">
+          {severity.coverage ?? 'partial'}
         </p>
       </div>
 
-      <p className="mt-1 text-[15px] text-brown-900">
-        <span className="font-semibold">{level}</span>
-        {severity.uncapped_level && severity.uncapped_level !== severity.level ? (
-          <span className="text-brown-600">
-            {' '}
-            (evidence would have reached {severity.uncapped_level})
-          </span>
-        ) : null}
-      </p>
+      <div className="mt-2 flex items-end gap-4">
+        <p
+          className={`font-display text-[48px] leading-none ${
+            severity.level === 'critical' ? 'text-coral-700' : 'text-brown-900'
+          }`}
+        >
+          {severity.score ?? '—'}
+          <span className="ml-1 align-super font-mono text-[12px] text-brown-600">/100</span>
+        </p>
+        <div className="pb-1">
+          <p className="text-[15px] font-semibold text-brown-900">{level}</p>
+          {severity.uncapped_level && severity.uncapped_level !== severity.level ? (
+            <p className="text-[12px] text-brown-600">
+              Evidence would have reached {severity.uncapped_level}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div aria-hidden className="mt-3 flex gap-1">
+        {[0, 1, 2, 3, 4].map((index) => (
+          <span
+            key={index}
+            className={`h-2 flex-1 ${
+              index < Math.round(((severity.score ?? 0) / 100) * 5)
+                ? severity.level === 'critical'
+                  ? 'bg-coral-700'
+                  : 'bg-coral-500'
+                : 'bg-sand-300'
+            }`}
+          />
+        ))}
+      </div>
 
       {severity.provisional ? (
         <p className="mt-2 border-l-4 border-coral-500 pl-3 text-[13px] text-brown-900">
@@ -101,9 +125,9 @@ function SeveritySection({ report, onReanalyse, busy }) {
       ) : null}
 
       {factors.length ? (
-        <dl className="mt-3 grid gap-1 text-[13px]">
+        <dl className="mt-4 grid text-[13px]">
           {factors.map(([name, factor]) => (
-            <div key={name} className="flex gap-2">
+            <div key={name} className="flex gap-2 border-t border-sand-300 py-1.5">
               <dt className="w-[92px] shrink-0 font-medium text-brown-900">{name}</dt>
               <dd className="min-w-0 flex-1 text-brown-600">
                 {factor.state === 'scored'
@@ -456,8 +480,13 @@ export function ReportPage({ id }) {
               </div>
             ) : null}
 
-            <div className="mt-4 flex flex-col gap-4">
-              <ReportDescription description={report.description} />
+            <div className="mt-4 flex flex-col gap-4 border-t border-sand-300 pt-4">
+              {/* The API's title is derived from the description, so showing both
+                  would print the same sentence twice. */}
+              {report.description &&
+              report.description.trim().toLowerCase() !== report.title.trim().toLowerCase() ? (
+                <ReportDescription description={report.description} />
+              ) : null}
               <LocationBlock
                 addressBlock={report.addressBlock}
                 mapHref={mapHref}
@@ -467,7 +496,7 @@ export function ReportPage({ id }) {
 
             <SeveritySection report={report} onReanalyse={onReanalyse} busy={busy} />
 
-            <div className="mt-6 flex flex-col gap-4">
+            <div className="mt-6 flex flex-col gap-4 border-t border-sand-300 pt-4">
               {report.updates?.length ? (
                 <OfficialUpdates
                   updates={report.updates}
@@ -480,7 +509,7 @@ export function ReportPage({ id }) {
 
             <DuplicatePrompt report={report} onAnswer={onAnswerDuplicate} busy={busy} />
 
-            <div className="mt-6">
+            <div className="mt-6 border-t border-sand-300 pt-4">
               <CommentsSection
                 reportId={report.id}
                 commentCount={report.commentCount}
@@ -488,7 +517,7 @@ export function ReportPage({ id }) {
               />
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 border-t border-sand-300 pt-4">
               <NearbyReports reports={nearby} />
             </div>
           </article>
