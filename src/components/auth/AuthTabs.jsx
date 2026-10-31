@@ -15,7 +15,7 @@ export function AuthTabs({ view, onChange }) {
       role="tablist"
       aria-label="Account access"
       onKeyDown={handleKeyDown}
-      className="flex gap-1 rounded-[999px] bg-sand-100 p-1"
+      className="flex gap-1 bg-sand-100 p-1"
     >
       {TAB_ORDER.map((id) => {
         const selected = id === view
@@ -27,7 +27,7 @@ export function AuthTabs({ view, onChange }) {
             aria-selected={selected}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(id)}
-            className={`h-11 flex-1 rounded-[999px] text-sm font-semibold transition-colors focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none ${
+            className={`h-11 flex-1 text-sm font-semibold transition-colors focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none ${
               selected
                 ? 'bg-brown-900 text-cream-50'
                 : 'bg-transparent text-brown-900 hover:bg-cream-100'

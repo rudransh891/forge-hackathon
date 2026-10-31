@@ -23,5 +23,5 @@
   <line x1="352" y1="640" x2="352" y2="700" stroke="#D9482F" stroke-width="3" />
 
   <!-- one coral marker -->
-  <circle cx="352" cy="716" r="7" fill="#F2A58F" />
+  <rect x="345" y="709" width="14" height="14" fill="#F2A58F" />
 </svg>

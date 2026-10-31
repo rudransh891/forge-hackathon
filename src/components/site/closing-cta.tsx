@@ -37,13 +37,13 @@ export function ClosingCta() {
           <Button
             type="button"
             onClick={() => openAuthModal('signup')}
-            className="h-12 rounded-md bg-coral-300 px-6 text-[15px] font-semibold text-brown-900 hover:bg-cream-100 hover:text-brown-900"
+            className="h-12 bg-coral-300 px-6 text-[15px] font-semibold text-brown-900 hover:bg-cream-100 hover:text-brown-900"
           >
             Create free account
           </Button>
           <Button
             variant="outline"
-            className="h-12 rounded-md border border-sand-300 bg-transparent px-6 text-[15px] font-semibold text-cream-100 hover:border-coral-300 hover:bg-transparent hover:text-cream-100"
+            className="h-12 border border-sand-300 bg-transparent px-6 text-[15px] font-semibold text-cream-100 hover:border-coral-300 hover:bg-transparent hover:text-cream-100"
           >
             Learn more
           </Button>

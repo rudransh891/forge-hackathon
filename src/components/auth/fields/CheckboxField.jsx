@@ -17,7 +17,7 @@ export function CheckboxField({ label, checked, onChange, error, id, className =
             onChange={(event) => onChange(event.target.checked)}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={error ? errorId : undefined}
-            className={`peer size-5 appearance-none rounded-[4px] border-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 ${
+            className={`peer size-5 appearance-none border-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 ${
               error ? 'border-coral-700' : 'border-brown-600'
             } checked:border-brown-900 checked:bg-brown-900`}
           />

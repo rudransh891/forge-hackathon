@@ -20,7 +20,7 @@ export function SiteHeader() {
           <span className="font-display text-[22px] leading-none tracking-tight text-brown-900">
             Civic Pulse
           </span>
-          <span aria-hidden className="size-1.5 rounded-full bg-coral-500" />
+          <span aria-hidden className="size-1.5 bg-coral-500" />
         </a>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
@@ -38,7 +38,7 @@ export function SiteHeader() {
         <Button
           type="button"
           onClick={() => openAuthModal('login')}
-          className="h-11 rounded-md bg-green-700 px-4 text-sm font-semibold text-cream-50"
+          className="h-11 bg-green-700 px-4 text-sm font-semibold text-cream-50"
         >
           Login / Sign up
         </Button>

@@ -140,7 +140,7 @@ export function SignupForm() {
                 {[0, 1, 2, 3].map((index) => (
                   <span
                     key={index}
-                    className={`h-1 flex-1 rounded-[2px] ${
+                    className={`h-1 flex-1 ${
                       index < strength.score ? STRENGTH_COLORS[strength.score] : 'bg-sand-300'
                     }`}
                   />
@@ -205,7 +205,7 @@ export function SignupForm() {
         <button
           type="submit"
           disabled={pending}
-          className="h-12 w-full rounded-[6px] bg-green-700 text-[15px] font-semibold text-cream-50 transition-colors hover:bg-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-300 disabled:text-brown-600"
+          className="h-12 w-full bg-green-700 text-[15px] font-semibold text-cream-50 transition-colors hover:bg-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-300 disabled:text-brown-600"
         >
           {pending ? 'Please wait...' : 'Create account'}
         </button>
@@ -224,11 +224,11 @@ export function SignupForm() {
               type="button"
               disabled={!method.enabled}
               onClick={() => method.onSelect?.()}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-[6px] border border-brown-600 bg-transparent text-sm font-semibold text-brown-900 transition-colors hover:bg-sand-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-100 disabled:text-brown-600"
+              className="flex h-12 w-full items-center justify-center gap-2 border border-brown-600 bg-transparent text-sm font-semibold text-brown-900 transition-colors hover:bg-sand-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-100 disabled:text-brown-600"
             >
               {method.label}
               {method.enabled ? null : (
-                <span className="rounded-[4px] bg-teal-100 px-1.5 py-0.5 text-xs font-semibold text-brown-900">
+                <span className=" bg-teal-100 px-1.5 py-0.5 text-xs font-semibold text-brown-900">
                   Coming soon
                 </span>
               )}

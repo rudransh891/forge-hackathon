@@ -39,15 +39,6 @@
   --font-headline: "Quicksand", "Fraunces Variable", Georgia, serif;
   --font-ui: "Public Sans Variable", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-
-  /* Square corners throughout: letterpress, not rounded web app. */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
-  --radius-4xl: 0px;
 }
 
 :root {
@@ -68,8 +59,7 @@
   --focus-ring: var(--color-teal-400);
   --overlay-scrim: rgba(43, 24, 16, 0.72);
 
-  /* Shape and space */
-  --radius-pill: 0px;
+  /* Shape and space. There are no radius tokens: every edge is square. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -104,7 +94,6 @@
   --border: var(--border-subtle);
   --input: var(--color-brown-600);
   --ring: var(--focus-ring);
-  --radius: 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -163,6 +152,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  /* Deadly edges: nothing in this product may have a radius, ever. The
+     !important is deliberate — it beats any component or utility that tries
+     to reintroduce one, including freshly added registry components. */
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    border-radius: 0 !important;
   }
   html {
     @apply font-sans;

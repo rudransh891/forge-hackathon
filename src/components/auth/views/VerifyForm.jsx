@@ -113,7 +113,7 @@ export function VerifyForm() {
 
       <div aria-live="polite">
         {banner ? (
-          <p className="mt-4 flex items-start gap-2 rounded-[6px] bg-teal-100 px-3 py-2.5 text-sm text-brown-900">
+          <p className="mt-4 flex items-start gap-2 bg-teal-100 px-3 py-2.5 text-sm text-brown-900">
             <InfoIcon size={16} />
             <span>{banner.text}</span>
           </p>
@@ -140,7 +140,7 @@ export function VerifyForm() {
                 aria-invalid={error ? 'true' : undefined}
                 aria-describedby={error ? 'verify-error' : 'auth-modal-desc'}
                 maxLength={1}
-                className={`h-14 w-12 rounded-[6px] border bg-cream-100 text-center text-xl font-semibold text-brown-900 focus-visible:border-2 focus-visible:border-green-700 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none ${
+                className={`h-14 w-12 border bg-cream-100 text-center text-xl font-semibold text-brown-900 focus-visible:border-2 focus-visible:border-green-700 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none ${
                   error ? 'border-coral-700' : 'border-brown-600'
                 }`}
               />
@@ -160,7 +160,7 @@ export function VerifyForm() {
         <button
           type="submit"
           disabled={pending}
-          className="mt-5 h-12 w-full rounded-[6px] bg-green-700 text-[15px] font-semibold text-cream-50 transition-colors hover:bg-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-300 disabled:text-brown-600"
+          className="mt-5 h-12 w-full bg-green-700 text-[15px] font-semibold text-cream-50 transition-colors hover:bg-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-300 disabled:text-brown-600"
         >
           {pending ? 'Please wait...' : 'Verify and continue'}
         </button>

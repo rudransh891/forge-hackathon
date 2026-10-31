@@ -7,8 +7,8 @@ export function RadioIllustration() {
   return (
     <svg viewBox="0 0 420 330" aria-hidden className="h-auto w-full max-w-[320px] md:max-w-[460px]">
       {/* antenna */}
-      <path d="M330 76 372 30" stroke="var(--color-coral-300)" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="375" cy="27" r="6" fill="var(--color-coral-300)" />
+      <path d="M330 76 372 30" stroke="var(--color-coral-300)" strokeWidth="4" strokeLinecap="square" />
+      <rect x="369" y="21" width="12" height="12" fill="var(--color-coral-300)" />
 
       {/* cabinet */}
       <rect x="30" y="76" width="360" height="204" fill="var(--color-cream-100)" />
@@ -37,10 +37,10 @@ export function RadioIllustration() {
       <path d="M312 126v26" stroke="var(--color-coral-500)" strokeWidth="3" />
 
       {/* knobs */}
-      <circle cx="278" cy="224" r="19" fill="var(--color-coral-500)" />
-      <circle cx="278" cy="224" r="6" fill="var(--color-cream-50)" />
-      <circle cx="334" cy="224" r="19" fill="var(--color-coral-500)" />
-      <circle cx="334" cy="224" r="6" fill="var(--color-cream-50)" />
+      <rect x="259" y="205" width="38" height="38" fill="var(--color-coral-500)" />
+      <rect x="272" y="218" width="12" height="12" fill="var(--color-cream-50)" />
+      <rect x="315" y="205" width="38" height="38" fill="var(--color-coral-500)" />
+      <rect x="328" y="218" width="12" height="12" fill="var(--color-cream-50)" />
 
       {/* feet */}
       <rect x="58" y="280" width="42" height="14" fill="var(--color-brown-700)" />
@@ -59,7 +59,7 @@ export function RoadArt({ className }: ArtProps) {
       <g stroke="var(--color-cream-50)" strokeWidth="5" strokeDasharray="26 22">
         <path d="M0 205h400" />
       </g>
-      <ellipse cx="196" cy="228" rx="34" ry="12" fill="var(--color-brown-950)" />
+      <rect x="162" y="216" width="68" height="24" fill="var(--color-brown-950)" />
       <path d="M286 196l16 30h-32z" fill="var(--color-coral-500)" />
       <rect x="281" y="226" width="10" height="16" fill="var(--color-coral-700)" />
       <rect x="58" y="96" width="70" height="46" fill="var(--color-cream-50)" />
@@ -72,17 +72,17 @@ export function ParkArt({ className }: ArtProps) {
   return (
     <svg viewBox="0 0 400 300" aria-hidden className={className}>
       <rect width="400" height="300" fill="var(--color-sand-100)" />
-      <ellipse cx="200" cy="252" rx="190" ry="42" fill="var(--color-sand-300)" />
+      <rect x="10" y="210" width="380" height="84" fill="var(--color-sand-300)" />
       <g>
         <rect x="86" y="196" width="10" height="62" fill="var(--color-brown-700)" />
-        <circle cx="91" cy="170" r="42" fill="var(--color-green-700)" />
+        <rect x="49" y="128" width="84" height="84" fill="var(--color-green-700)" />
         <rect x="286" y="206" width="9" height="52" fill="var(--color-brown-700)" />
-        <circle cx="290" cy="184" r="32" fill="var(--color-green-700)" />
+        <rect x="258" y="152" width="64" height="64" fill="var(--color-green-700)" />
       </g>
       <g>
         <rect x="196" y="150" width="7" height="112" fill="var(--color-brown-900)" />
-        <circle cx="199" cy="146" r="18" fill="var(--color-coral-500)" />
-        <path d="M199 128a18 18 0 0 1 18 18" stroke="var(--color-brown-900)" strokeWidth="4" fill="none" />
+        <rect x="181" y="128" width="36" height="36" fill="var(--color-coral-500)" />
+        <rect x="181" y="122" width="36" height="6" fill="var(--color-brown-900)" />
       </g>
     </svg>
   )
@@ -98,11 +98,11 @@ export function BusArt({ className }: ArtProps) {
       <rect x="164" y="116" width="72" height="42" fill="var(--color-cream-50)" />
       <rect x="248" y="116" width="72" height="42" fill="var(--color-cream-50)" />
       <rect x="58" y="176" width="284" height="8" fill="var(--color-cream-100)" />
-      <circle cx="118" cy="222" r="22" fill="var(--color-brown-900)" />
-      <circle cx="118" cy="222" r="9" fill="var(--color-cream-50)" />
-      <circle cx="282" cy="222" r="22" fill="var(--color-brown-900)" />
-      <circle cx="282" cy="222" r="9" fill="var(--color-cream-50)" />
-      <circle cx="322" cy="134" r="7" fill="var(--color-cream-50)" />
+      <rect x="96" y="200" width="44" height="44" fill="var(--color-brown-900)" />
+      <rect x="109" y="213" width="18" height="18" fill="var(--color-cream-50)" />
+      <rect x="260" y="200" width="44" height="44" fill="var(--color-brown-900)" />
+      <rect x="273" y="213" width="18" height="18" fill="var(--color-cream-50)" />
+      <rect x="315" y="127" width="14" height="14" fill="var(--color-cream-50)" />
     </svg>
   )
 }

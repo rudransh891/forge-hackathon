@@ -177,12 +177,14 @@ Prefer single-file or single-test runs during iteration. Full suites are for the
 - Naming: shadcn generates kebab-case files, PascalCase components, `data-slot` attributes
 - Import style: `@/...` alias (defined in `tsconfig.app.json` + `vite.config.ts`), no `baseUrl` — TS 7 removed it
 - Styling: colours, fonts and radii come from tokens in `src/index.css` (`bg-page`, `text-ink`, `border-hairline`, `font-display`, …). Never hard-code a hex value in a component.
+- Shape: **rectangles only**. No `rounded-*` class, no `border-radius`, no `<circle>`, no `<ellipse>`, no circular dots or avatars. `border-radius: 0 !important` in `src/index.css` enforces it; treat a rounded component as a bug.
 - Error handling pattern: n/a
 - Testing pattern and framework: none
 
 ### Forbidden
 - `baseUrl` in any tsconfig: TypeScript 7 errors with TS5102. Use `paths` relative to the tsconfig instead.
 - Hard-coded hex colours or font stacks in components; they must go through the tokens.
+- Any radius or circular shape: `rounded-*`, `border-radius`, `<circle>`, `<ellipse>`, round line caps. Deadly edges only.
 - Adding unused template files back into `src/assets/` or `public/`.
 
 ---

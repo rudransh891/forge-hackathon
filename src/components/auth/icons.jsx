@@ -83,7 +83,7 @@ export function InfoIcon({ size = 20, className }) {
 export function BroadcastIcon({ size = 20, className }) {
   return (
     <Svg size={size} className={className}>
-      <circle cx="12" cy="12" r="2.4" />
+      <rect x="9.6" y="9.6" width="4.8" height="4.8" />
       <path d="M8.6 5.3a9.4 9.4 0 0 0 0 13.4l1.42-1.42a7.4 7.4 0 0 1 0-10.56Z" />
       <path d="M15.4 5.3a9.4 9.4 0 0 1 0 13.4l-1.42-1.42a7.4 7.4 0 0 0 0-10.56Z" />
     </Svg>

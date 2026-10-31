@@ -136,7 +136,7 @@ export function AuthModal() {
         aria-describedby="auth-modal-desc"
         style={wholeModal ? backgroundStyle() : undefined}
         className={cn(
-          'relative grid max-h-[92dvh] w-[calc(100%-24px)] grid-cols-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-[16px] bg-cream-50 shadow-[0_24px_60px_rgba(43,24,16,0.45)] transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none md:max-h-[90dvh] md:min-h-[560px] md:w-full md:max-w-[880px] md:grid-cols-[2fr_3fr] md:grid-rows-[minmax(0,1fr)]',
+          'relative grid max-h-[92dvh] w-[calc(100%-24px)] grid-cols-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-cream-50 shadow-[0_24px_60px_rgba(43,24,16,0.45)] transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none md:max-h-[90dvh] md:min-h-[560px] md:w-full md:max-w-[880px] md:grid-cols-[2fr_3fr] md:grid-rows-[minmax(0,1fr)]',
           entered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
         )}
       >
@@ -156,7 +156,7 @@ export function AuthModal() {
           type="button"
           onClick={closeAuthModal}
           aria-label="Close"
-          className="absolute top-4 right-4 z-30 grid size-10 place-items-center rounded-full text-cream-100 transition-colors hover:bg-brown-700 hover:text-cream-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none md:text-brown-900 md:hover:bg-sand-100 md:hover:text-brown-900"
+          className="absolute top-4 right-4 z-30 grid size-10 place-items-center text-cream-100 transition-colors hover:bg-brown-700 hover:text-cream-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none md:text-brown-900 md:hover:bg-sand-100 md:hover:text-brown-900"
         >
           <CloseIcon size={20} />
         </button>

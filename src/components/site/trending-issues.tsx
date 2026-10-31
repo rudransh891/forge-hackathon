@@ -49,7 +49,7 @@ function StatusBadge({ status }: { status: Status }) {
   const { label, className, Icon } = STATUS[status]
   return (
     <span
-      className={`label-caps inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] px-2.5 py-1 ${className}`}
+      className={`label-caps inline-flex items-center gap-1.5 px-2.5 py-1 ${className}`}
     >
       <Icon aria-hidden className="size-3.5" />
       {label}
@@ -125,7 +125,7 @@ export function TrendingIssues() {
 
         <Button
           variant="outline"
-          className="mt-10 h-12 rounded-md border border-coral-300 bg-transparent px-5 text-[15px] font-semibold text-coral-300 hover:bg-coral-300 hover:text-brown-900"
+          className="mt-10 h-12 border border-coral-300 bg-transparent px-5 text-[15px] font-semibold text-coral-300 hover:bg-coral-300 hover:text-brown-900"
         >
           Browse all issues
           <ArrowRight aria-hidden className="size-4" />

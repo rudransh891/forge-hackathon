@@ -42,7 +42,7 @@ export function AuthBrandPanel({ view }) {
             <li key={benefit} className="flex items-start gap-2.5 text-sm text-cream-100">
               <span
                 aria-hidden
-                className="mt-[7px] size-1.5 shrink-0 rounded-full bg-coral-300"
+                className="mt-[7px] size-1.5 shrink-0 bg-coral-300"
               />
               {benefit}
             </li>

@@ -22,7 +22,7 @@ The radio is the metaphor: you *tune in* to what is happening in your community.
 | 11 | Photos | Real user photos; framed consistently, never filtered |
 | 12 | Output | CSS custom properties (tokens), easily mapped to Tailwind or Figma variables |
 
-> **Easy editing rule:** never hard-code a color, font or radius in a component.
+> **Easy editing rule:** never hard-code a color, font or spacing value in a component.
 > Every value comes from a token in Section 8. Change the token, and the whole app updates.
 
 ---
@@ -59,12 +59,12 @@ The radio is the metaphor: you *tune in* to what is happening in your community.
 | `--color-coral-100` | `#FBE3DB` | Reserved, pale coral wash |
 | `--color-coral-300` | `#F2A58F` | Brand coral **on brown**, 3:1 pairs |
 | `--color-coral-500` | `#D9482F` | Brand coral on cream: accents 24px+, the frame, illustration accents |
-| `--color-coral-700` | `#B8361F` | Urgent pill, small coral text on cream |
+| `--color-coral-700` | `#B8361F` | Urgent tag, small coral text on cream |
 | `--color-amber-500` | `#C98A1B` | Warning fills (pair with brown-900 text) |
 
 **Coral has two jobs and they never mix.** BRAND coral is accent words in headlines (24px+),
-section numbers, dots, icons, underlines and illustration fills — never a pill, never a
-warning icon, never a card edge. STATUS coral is urgent only: coral-700 pill + warning icon
+section numbers, dots, icons, underlines and illustration fills — never an urgent tag, never a
+warning icon, never a card edge. STATUS coral is urgent only: coral-700 tag + warning icon
 + 4px left edge on the card.
 
 **Green-700 is an action colour on cream sections only.** Anything sitting on a brown panel
@@ -150,20 +150,27 @@ In the shipped build the hero display is set at 64/68 on desktop so the two-line
 
 ## 4. Spacing, shape and elevation
 
+**Rectangles only. Deadly edges. No exceptions.**
+
+Every edge in this product is a right angle. There is no border-radius anywhere in the
+system, at any size, for any component: buttons, inputs, cards, dialogs, badges, chips,
+tickers, progress bars, scrollbars, avatars, panels, illustrations. There are no circles,
+no ovals, no pills, no round knobs, no circular avatars, no π, and no "just this once".
+
 | Token | Value |
 |-------|-------|
 | `--space-1` to `--space-8` | 4, 8, 12, 16, 24, 32, 48, 64 px |
-| `--radius-sm` | 0 px (inputs, tags) |
-| `--radius-md` | 0 px (cards, buttons) |
-| `--radius-pill` | 0 px (chips, ticker items) |
 | `--border-hairline` | 1px solid `--border-subtle` |
 | `--shadow-card` | `0 1px 2px rgba(62, 36, 25, 0.12)` (the only shadow; keep it flat) |
 
-- **Every corner is square.** Radii are 0 across the system: this is letterpress and
-  newsprint, not a rounded web app. Chips, badges and ticker items that would normally be
-  pills are cut as rectangles.
-- **Circles stay circles.** The only round things in the product are shapes that are round
-  by nature: the wordmark dot, radio controls, avatars, and icons. Never a rounded border.
+- A shape that would be a circle is drawn as a square with the same bounding box.
+- A shape that would be a pill or a chip is drawn as a rectangle of the same height.
+- Dial knobs, radio controls, avatars, wordmark dots and bullet markers are all squares.
+- SVG artwork uses `<rect>` and straight `<path>` segments only. No `<circle>`, no
+  `<ellipse>`, no round line caps. (The two supplied Material eye glyphs are the single
+  exception: their supplied path data is never edited.)
+- `border-radius: 0 !important` is enforced globally in `src/index.css`. Treat it as law:
+  a component that arrives with a radius is a bug, not a style choice.
 - Prefer **hairline borders over shadows** for an editorial, old-money feel.
 - Page padding: 20 px mobile, 64 px desktop. Max content width: 1120 px.
 
@@ -211,7 +218,7 @@ In the shipped build the hero display is set at 64/68 on desktop so the two-line
 | Closing soon | amber-500 | brown-900 |
 | Urgent | coral-700 | cream-50 |
 
-Labels style, square tag (radius 0), always include an icon or text, never color only.
+Labels style, rectangular tag, always include an icon or text, never color only.
 
 ### 5.4 Live ticker (reuse of the marquee strip)
 
@@ -221,10 +228,10 @@ Labels style, square tag (radius 0), always include an icon or text, never color
 
 ### 5.5 Tuning-dial filter
 
-- A segmented control styled like a radio dial: a thin horizontal scale with tick marks and a circular knob.
+- A segmented control styled like a radio dial: a thin horizontal scale with tick marks and a square block as the marker.
 - Options: Locality, Topic, Urgency (choose one at a time).
 - Must be keyboard operable (arrow keys), with a plain dropdown fallback for assistive tech.
-- The knob snaps to positions with no spring animation.
+- The marker snaps to positions with no spring animation.
 
 ### 5.6 Forms (report an issue, profile)
 
@@ -252,7 +259,7 @@ Labels style, square tag (radius 0), always include an icon or text, never color
 
 ### 6.1 Illustration style (flat, editable)
 
-- Built only from basic shapes (rectangles, circles, squares, simple paths). No rounded rectangles.
+- Built only from rectangles and squares. No circles, no ovals, no rounded rectangles.
 - **Palette limited to the tokens in Section 2**; use no gradients, no outlines thicker than 2 px, and no shadows.
 - Recommended file format: SVG, with colors set through `fill="currentColor"` or CSS variables (`fill: var(--color-teal-400)`), so recoloring never means editing the artwork.
 - Layer naming convention: `bg`, `body`, `accent`, `detail` (makes editing predictable).
@@ -263,7 +270,7 @@ Labels style, square tag (radius 0), always include an icon or text, never color
 
 ### 6.2 Icons
 
-- 24 px grid, 1.75 px stroke, rounded caps, one consistent set (e.g. Lucide).
+- 24 px grid, 1.75 px stroke, square caps, one consistent set (e.g. Lucide).
 - Icons inherit `currentColor`; never ship multi-colored icons.
 
 ---
@@ -289,7 +296,7 @@ Labels style, square tag (radius 0), always include an icon or text, never color
 | Issue / post card | 4:3 | `object-fit: cover`, focal point centered |
 | Featured story / hero | 16:9 | Editorial images only |
 | Post detail (gallery) | Original, max height 70vh | Tap to expand, pinch to zoom |
-| Avatar | 1:1 | Circle, 40 px (list) or 72 px (profile) |
+| Avatar | 1:1 | Square, 40 px (list) or 72 px (profile) |
 | Thumbnail strip | 1:1 | 64 px, square corners |
 
 - Upload limits: accept JPEG, PNG, WebP; resize to 1600 px on the long edge; serve responsive sizes and lazy-load below the fold.
@@ -297,7 +304,7 @@ Labels style, square tag (radius 0), always include an icon or text, never color
 
 ### 7.3 Frame, overlay and placeholder rules
 
-- **Frame:** square corners (no radius), `--border-hairline` around the image.
+- **Frame:** square corners, `--border-hairline` around the image.
 - **Multiple photos:** 1 = full width, 2 = side by side, 3+ = one large plus a "+N" tile in brown-900 with cream text.
 - **Text over photo (only if unavoidable):** place on a solid brown-900 band at 90% opacity, or a bottom gradient scrim from `rgba(62, 36, 25, 0.85)` to transparent, with cream text. Never place text directly on an uncontrolled photo.
 - **Loading:** cream-300 block at the correct ratio (prevents layout shift), with no shimmer.
@@ -311,7 +318,6 @@ Labels style, square tag (radius 0), always include an icon or text, never color
 :root {
   --photo-ratio-card: 4 / 3;
   --photo-ratio-hero: 16 / 9;
-  --photo-radius: var(--radius-md);
   --photo-border: 1px solid var(--border-subtle);
   --photo-placeholder-bg: var(--color-cream-300);
   --photo-scrim: linear-gradient(to top, rgba(62, 36, 25, 0.85), rgba(62, 36, 25, 0));
@@ -321,7 +327,6 @@ Labels style, square tag (radius 0), always include an icon or text, never color
   aspect-ratio: var(--photo-ratio-card);
   width: 100%;
   object-fit: cover;
-  border-radius: var(--photo-radius);
   border: var(--photo-border);
   background: var(--photo-placeholder-bg);
 }
@@ -385,9 +390,6 @@ Labels style, square tag (radius 0), always include an icon or text, never color
   --focus-ring: var(--color-teal-400);
 
   /* Shape and spacing — square corners everywhere */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-pill: 0px;
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
   --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
   --shadow-card: 0 1px 2px rgba(62, 36, 25, 0.12);

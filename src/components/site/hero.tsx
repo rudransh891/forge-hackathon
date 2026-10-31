@@ -76,11 +76,11 @@ export function Hero() {
                 onChange={(event) => setArea(event.target.value)}
                 placeholder="e.g. 60607 or Chicago"
                 autoComplete="postal-code"
-                className="h-12 min-w-0 flex-1 rounded-sm border border-brown-600 bg-cream-50 px-3 text-base text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700"
+                className="h-12 min-w-0 flex-1 border border-brown-600 bg-cream-50 px-3 text-base text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700"
               />
               <Button
                 type="submit"
-                className="h-12 rounded-md bg-green-700 px-5 text-[15px] font-semibold text-cream-50"
+                className="h-12 bg-green-700 px-5 text-[15px] font-semibold text-cream-50"
               >
                 See my area
               </Button>
@@ -106,7 +106,7 @@ export function Hero() {
           <div className="flex w-full flex-col items-center gap-6 bg-brown-900 p-6 md:p-8">
             <RadioIllustration />
             <p className="label-caps flex items-center gap-2 text-sand-300">
-              <span aria-hidden className="size-1.5 rounded-full bg-coral-300" />
+              <span aria-hidden className="size-1.5 bg-coral-300" />
               Ward 7 · on the air
             </p>
           </div>

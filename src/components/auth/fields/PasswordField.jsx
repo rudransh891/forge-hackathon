@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AlertIcon, EyeIcon, EyeOffIcon } from '../icons'
 
 const BASE =
-  'h-12 w-full rounded-[6px] border bg-cream-100 py-0 pr-12 pl-3 text-[16px] text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400'
+  'h-12 w-full border bg-cream-100 py-0 pr-12 pl-3 text-[16px] text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400'
 
 export function PasswordField({
   id,
@@ -41,7 +41,7 @@ export function PasswordField({
           disabled={disabled}
           aria-label={visible ? 'Hide password' : 'Show password'}
           aria-pressed={visible}
-          className="absolute top-1/2 right-1 grid size-10 -translate-y-1/2 place-items-center rounded-[6px] text-brown-600 hover:text-brown-900 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400 disabled:text-sand-300"
+          className="absolute top-1/2 right-1 grid size-10 -translate-y-1/2 place-items-center text-brown-600 hover:text-brown-900 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400 disabled:text-sand-300"
         >
           {visible ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
         </button>

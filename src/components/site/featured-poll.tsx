@@ -76,12 +76,12 @@ export function FeaturedPoll() {
                     />
                     <span
                       aria-hidden
-                      className={`grid size-5 shrink-0 place-items-center rounded-full border-2 ${
+                      className={`grid size-5 shrink-0 place-items-center border-2 ${
                         isSelected ? 'border-brown-900' : 'border-brown-600'
                       }`}
                     >
                       {isSelected ? (
-                        <span className="size-2.5 rounded-full bg-coral-500" />
+                        <span className="size-2.5 bg-coral-500" />
                       ) : null}
                     </span>
                     <span>{option.label}</span>
@@ -93,7 +93,7 @@ export function FeaturedPoll() {
             <Button
               type="submit"
               disabled={!selected || voted}
-              className="mt-4 h-12 rounded-md bg-green-700 px-5 text-[15px] font-semibold text-cream-50 disabled:bg-sand-300 disabled:text-brown-600 disabled:opacity-100"
+              className="mt-4 h-12 bg-green-700 px-5 text-[15px] font-semibold text-cream-50 disabled:bg-sand-300 disabled:text-brown-600 disabled:opacity-100"
             >
               {voted ? 'Vote counted' : 'Submit my vote'}
             </Button>

@@ -15,7 +15,7 @@ export function SiteFooter() {
           <span className="font-display text-[22px] leading-none text-cream-100">
             Civic Pulse
           </span>
-          <span aria-hidden className="size-1.5 rounded-full bg-coral-300" />
+          <span aria-hidden className="size-1.5 bg-coral-300" />
         </div>
 
         <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
