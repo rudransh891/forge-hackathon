@@ -389,7 +389,7 @@ Labels style, rectangular tag, always include an icon or text, never color only.
   --border-subtle: var(--color-cream-300);
   --focus-ring: var(--color-teal-400);
 
-  /* Shape and spacing — square corners everywhere */
+  /* Shape and spacing — rectangles only, no radii anywhere */
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
   --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
   --shadow-card: 0 1px 2px rgba(62, 36, 25, 0.12);
