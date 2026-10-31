@@ -61,14 +61,26 @@ export function CommentsSection({ reportId, commentCount, onRequireAuth }) {
         </h2>
         <label className="flex items-center gap-2 text-[13px] text-brown-600">
           Sort
-          <select
-            value={sort}
-            onChange={(event) => setSort(event.target.value)}
-            className="h-11 border border-brown-600 bg-cream-50 px-2 text-[13px] text-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
-          >
-            <option value="top">Top</option>
-            <option value="newest">Newest</option>
-          </select>
+          <span className="relative inline-flex">
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value)}
+              className="h-11 appearance-none border border-brown-600 bg-cream-50 pr-9 pl-3 text-[13px] text-brown-900 focus-visible:border-green-700 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
+            >
+              <option value="top">Top</option>
+              <option value="newest">Newest</option>
+            </select>
+            <svg
+              aria-hidden="true"
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-brown-900"
+            >
+              <path d="M12 16.5 3.5 7.5h17L12 16.5Z" />
+            </svg>
+          </span>
         </label>
       </div>
 
