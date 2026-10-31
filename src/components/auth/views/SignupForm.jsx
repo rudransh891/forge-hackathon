@@ -11,7 +11,6 @@ import {
   validateName,
   validatePassword,
   validateTerms,
-  validateZip,
 } from '../authValidation'
 import { signup } from '../authService'
 
@@ -29,7 +28,6 @@ export function SignupForm() {
   const [form, setForm] = useState({
     name: '',
     identifier: '',
-    zip: '',
     password: '',
     confirm: '',
     terms: false,
@@ -46,7 +44,6 @@ export function SignupForm() {
     const validators = {
       name: () => validateName(value),
       identifier: () => validateIdentifier(value),
-      zip: () => validateZip(value),
       password: () => validatePassword(value),
       confirm: () => validateConfirm(form.password, value),
       terms: () => validateTerms(value),
@@ -60,13 +57,12 @@ export function SignupForm() {
     const next = {
       name: validateName(form.name),
       identifier: validateIdentifier(form.identifier),
-      zip: validateZip(form.zip),
       password: validatePassword(form.password),
       confirm: validateConfirm(form.password, form.confirm),
       terms: validateTerms(form.terms),
     }
     setErrors(next)
-    const firstInvalid = ['name', 'identifier', 'zip', 'password', 'confirm', 'terms'].find(
+    const firstInvalid = ['name', 'identifier', 'password', 'confirm', 'terms'].find(
       (key) => next[key],
     )
     if (firstInvalid) {
@@ -77,7 +73,6 @@ export function SignupForm() {
     const result = await signup({
       name: form.name.trim(),
       identifier: form.identifier.trim(),
-      zip: form.zip.trim(),
       password: form.password,
       wardUpdates: form.wardUpdates,
     })
@@ -126,20 +121,6 @@ export function SignupForm() {
           value={form.identifier}
           error={errors.identifier}
           onChange={(event) => setField('identifier', event.target.value)}
-        />
-
-        <TextField
-          id="signup-zip"
-          label="ZIP code"
-          inputMode="numeric"
-          autoComplete="postal-code"
-          maxLength={5}
-          required
-          placeholder="60607"
-          helper="Places you in your ward."
-          value={form.zip}
-          error={errors.zip}
-          onChange={(event) => setField('zip', event.target.value)}
         />
 
         <div>

@@ -23,7 +23,7 @@ export async function login(payload) {
 }
 
 /**
- * @param {{ name: string, identifier: string, zip: string, password: string, wardUpdates: boolean }} payload
+ * @param {{ name: string, identifier: string, password: string, wardUpdates: boolean }} payload
  * @returns {Promise<{ status: 'not_configured' }>}
  */
 export async function signup(payload) {

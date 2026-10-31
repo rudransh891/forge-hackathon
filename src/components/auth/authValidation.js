@@ -28,13 +28,6 @@ export function validateName(value) {
   return null
 }
 
-export function validateZip(value) {
-  const trimmed = String(value).trim()
-  if (!trimmed) return 'Enter your ZIP code'
-  if (!/^\d{5}$/.test(trimmed)) return 'Enter a 5-digit ZIP code'
-  return null
-}
-
 export function validatePassword(value) {
   if (!value) return 'Enter a password'
   if (String(value).length < 8) return 'Use at least 8 characters'

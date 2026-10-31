@@ -57,7 +57,4 @@ export const benefits = [
   'Track what actually gets fixed',
 ]
 
-export const methods = [
-  { id: 'google', label: 'Continue with Google', enabled: false },
-  { id: 'phone-otp', label: 'Continue with phone code', enabled: false },
-]
+export const methods = [{ id: 'google', label: 'Continue with Google', enabled: false }]

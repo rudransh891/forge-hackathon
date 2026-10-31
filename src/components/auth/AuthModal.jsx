@@ -156,7 +156,7 @@ export function AuthModal() {
           type="button"
           onClick={closeAuthModal}
           aria-label="Close"
-          className="absolute top-2 right-2 z-30 grid size-10 place-items-center rounded-[6px] text-cream-100 transition-colors hover:bg-sand-100 hover:text-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none md:text-brown-900"
+          className="absolute top-4 right-4 z-30 grid size-10 place-items-center rounded-full text-cream-100 transition-colors hover:bg-brown-700 hover:text-cream-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none md:text-brown-900 md:hover:bg-sand-100 md:hover:text-brown-900"
         >
           <CloseIcon size={20} />
         </button>
