@@ -23,7 +23,7 @@ export function FeaturedPoll() {
     <section
       id="polls"
       aria-labelledby="poll-title"
-      className="scroll-mt-16 border-b border-sand-300 bg-cream-100 py-14 md:py-20"
+      className="scroll-mt-16 border-b border-sand-300 py-14 md:py-20"
     >
       <Container className="grid gap-10 md:grid-cols-2 md:gap-16">
         <div>

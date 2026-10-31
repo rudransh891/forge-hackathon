@@ -25,7 +25,7 @@ export function Faq() {
     <section
       id="faq"
       aria-labelledby="faq-title"
-      className="scroll-mt-16 border-b border-sand-300 bg-cream-100 py-14 md:py-20"
+      className="scroll-mt-16 border-b border-sand-300 py-14 md:py-20"
     >
       <Container className="grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
         <div>

@@ -26,7 +26,7 @@ export function Hero() {
   )
 
   return (
-    <section aria-labelledby="hero-title" className="border-b border-sand-300 bg-cream-100">
+    <section aria-labelledby="hero-title" className="border-b border-sand-300">
       <Container className="grid gap-12 py-14 md:grid-cols-[1.28fr_0.72fr] md:items-center md:gap-12 md:py-20">
         <div ref={scope}>
           <SectionMarker

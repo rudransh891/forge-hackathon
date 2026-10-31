@@ -23,7 +23,7 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-title"
-      className="scroll-mt-16 border-b border-sand-300 bg-cream-100 py-14 md:py-20"
+      className="scroll-mt-16 border-b border-sand-300 py-14 md:py-20"
     >
       <Container>
         <SectionMarker
@@ -46,7 +46,7 @@ export function HowItWorks() {
             <li key={step.index} className="border border-cream-300 bg-cream-50 p-6">
               <span
                 aria-hidden
-                className="grid size-11 place-items-center bg-brown-900 font-mono text-sm text-coral-300"
+                className="grid size-11 place-items-center font-mono text-sm text-brown-300 font-semibold"
               >
                 {step.index}
               </span>

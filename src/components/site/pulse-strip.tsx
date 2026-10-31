@@ -9,9 +9,9 @@ const STATS = [
 
 export function PulseStrip() {
   return (
-    <section aria-label="Live pulse" className="bg-cream-100 py-8 md:py-10">
-      <div className="bg-teal-400 md:mx-4">
-        <Container className="grid grid-cols-2 gap-y-6 py-7 text-brown-900 md:grid-cols-4 md:gap-y-0">
+    <section aria-label="Live pulse" className="py-8 md:py-10">
+      <div className="bg-coral-450 md:mx-4">
+        <Container className="grid grid-cols-2 gap-y-6 py-7 text-white md:grid-cols-4 md:gap-y-0">
           {STATS.map((stat, index) => (
             <div
               key={stat.label}

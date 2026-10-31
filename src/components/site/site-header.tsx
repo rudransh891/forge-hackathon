@@ -11,7 +11,7 @@ const LINKS = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-sand-300 bg-cream-100">
+    <header className="sticky top-0 z-40 border-b border-sand-300 bg-cream-100/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-6">
         <a href="#top" className="flex items-baseline gap-1.5">
           <span className="font-display text-[22px] leading-none tracking-tight text-brown-900">
