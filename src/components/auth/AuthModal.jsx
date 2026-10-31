@@ -161,7 +161,7 @@ export function AuthModal() {
           <CloseIcon size={20} />
         </button>
 
-        <div className="relative flex min-h-0 flex-col overflow-y-auto bg-cream-50 px-5 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:px-8 md:py-8">
+        <div className="modal-scroll relative flex min-h-0 flex-col overflow-y-auto bg-cream-50 px-5 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:px-8 md:py-8">
           {showTabs ? (
             <div className="md:pr-12">
               <AuthTabs view={view} onChange={openAuthModal} />

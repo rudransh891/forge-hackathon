@@ -197,3 +197,31 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* Square scrollbar for the modal's inner scroller: no rounding on the thumb
+   or the track, in the panel palette. */
+.modal-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.modal-scroll::-webkit-scrollbar-track {
+  background: var(--color-cream-100);
+  border-radius: 0;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-brown-700);
+  border-radius: 0;
+}
+.modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brown-900);
+}
+.modal-scroll::-webkit-scrollbar-corner {
+  background: var(--color-cream-100);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .modal-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-brown-700) var(--color-cream-100);
+  }
+}
