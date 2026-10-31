@@ -27,7 +27,7 @@ export function Hero() {
 
   return (
     <section aria-labelledby="hero-title" className="border-b border-hairline">
-      <Container className="grid gap-12 py-14 md:grid-cols-[1.15fr_0.85fr] md:items-center md:gap-12 md:py-20">
+      <Container className="grid gap-12 py-14 md:grid-cols-[1.28fr_0.72fr] md:items-center md:gap-12 md:py-20">
         <div ref={scope}>
           <SectionMarker index="01" className="text-ink-muted">
             <span className="inline-flex items-center gap-1.5">
@@ -39,7 +39,7 @@ export function Hero() {
           <h1
             id="hero-title"
             data-reveal
-            className="mt-5 font-headline text-[40px] leading-[1.04] font-light tracking-[-0.01em] text-ink md:text-[64px] md:leading-[68px]"
+            className="mt-5 font-headline text-[40px] leading-[1.04] font-bold tracking-[-0.01em] text-ink md:text-[64px] md:leading-[68px]"
           >
             take your
             <br />
