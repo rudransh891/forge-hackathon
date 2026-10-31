@@ -39,11 +39,11 @@ export function Hero() {
           <h1
             id="hero-title"
             data-reveal
-            className="mt-5 font-headline text-[40px] leading-[1.04] font-bold tracking-[-0.01em] text-ink md:text-[64px] md:leading-[68px]"
+            className="mt-5 font-headline text-[40px] leading-[1.04] font-semibold tracking-[-0.01em] text-ink md:text-[64px] md:leading-[68px]"
           >
             take your
             <br />
-            community’s <em className="italic">pulse</em>
+            community’s <em className="italic font-headline font-[350]">pulse</em>
           </h1>
 
           <p data-reveal className="mt-6 max-w-[52ch] text-lg leading-relaxed text-ink-muted">
