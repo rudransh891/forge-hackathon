@@ -168,7 +168,7 @@ Boris Cherny (creator of Claude Code) keeps his team's file around 100 lines. Un
 Prefer single-file or single-test runs during iteration. Full suites are for the final verification pass.
 
 ### Layout
-- Source lives in: `src/` (`src/components/ui/` = ShadCN components, `src/lib/utils.ts` = `cn`)
+- Source lives in: `src/` (`src/components/site/` = landing-page sections, `src/components/ui/` = ShadCN primitives, `src/index.css` = design tokens, `src/lib/utils.ts` = `cn`)
 - Tests live in: none
 - Do not modify: `src/components/ui/*` unless you intend to fork that component; re-adding overwrites
   (use `npx shadcn@latest add <name> --no-reinstall` if you have edited one)
@@ -176,11 +176,13 @@ Prefer single-file or single-test runs during iteration. Full suites are for the
 ### Conventions specific to this repo
 - Naming: shadcn generates kebab-case files, PascalCase components, `data-slot` attributes
 - Import style: `@/...` alias (defined in `tsconfig.app.json` + `vite.config.ts`), no `baseUrl` — TS 7 removed it
+- Styling: colours, fonts and radii come from tokens in `src/index.css` (`bg-page`, `text-ink`, `border-hairline`, `font-display`, …). Never hard-code a hex value in a component.
 - Error handling pattern: n/a
 - Testing pattern and framework: none
 
 ### Forbidden
 - `baseUrl` in any tsconfig: TypeScript 7 errors with TS5102. Use `paths` relative to the tsconfig instead.
+- Hard-coded hex colours or font stacks in components; they must go through the tokens.
 - Adding unused template files back into `src/assets/` or `public/`.
 
 ---

@@ -1,0 +1,30 @@
+import { Container } from '@/components/site/layout'
+
+const STATS = [
+  { value: '12,480', label: 'residents participating' },
+  { value: '63', label: 'open issues' },
+  { value: '41', label: 'resolved this month' },
+  { value: '4', label: 'active polls' },
+]
+
+export function PulseStrip() {
+  return (
+    <section aria-label="Live pulse" className="border-b border-hairline bg-teal-400 text-brown-900">
+      <Container className="grid grid-cols-2 gap-y-6 py-6 md:grid-cols-4 md:gap-y-0">
+        {STATS.map((stat, index) => (
+          <div
+            key={stat.label}
+            className={
+              index > 0
+                ? 'md:border-l md:border-brown-900/20 md:pl-8'
+                : undefined
+            }
+          >
+            <p className="font-mono text-[26px] leading-none tracking-tight">{stat.value}</p>
+            <p className="mt-2 text-sm">{stat.label}</p>
+          </div>
+        ))}
+      </Container>
+    </section>
+  )
+}

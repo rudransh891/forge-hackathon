@@ -30,10 +30,29 @@ Re-adding an edited component overwrites it unless you pass `--no-reinstall`.
 The CLI is v4: it takes `-b radix|base|aria` and `-p nova|vega|maia|...`, not the old
 `--style` / `--base-color` flags.
 
+## The landing page
+
+`src/App.tsx` composes the Civic Pulse landing page from `src/components/site/`:
+
+| Section | File |
+| --- | --- |
+| Header / nav | `site-header.tsx` |
+| Hero + location lookup + hotspot map | `hero.tsx` |
+| Live pulse stats strip | `pulse-strip.tsx` |
+| Trending issues | `trending-issues.tsx` |
+| How it works | `how-it-works.tsx` |
+| Featured poll with live results | `featured-poll.tsx` |
+| Closing CTA + footer | `closing-cta.tsx`, `site-footer.tsx` |
+
+Colour, type and radius tokens live in `src/index.css` (see `design-guidelines.md`).
+Components use the semantic utilities (`bg-page`, `text-ink`, `border-hairline`,
+`font-display`) rather than raw hex values, so a palette change is one file.
+
 ## Animation
 
 `gsap` and `@gsap/react` are installed. Use the `useGSAP` hook with a `scope` ref so tweens
-are cleaned up on unmount. Scroll-triggered work lives in `src/App.tsx` as a reference.
+are cleaned up on unmount. The hero fade in `src/components/site/hero.tsx` is the reference
+implementation, and it opts out when `prefers-reduced-motion` is set.
 
 Two gotchas worth knowing:
 
