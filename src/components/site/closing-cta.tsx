@@ -9,7 +9,7 @@ export function ClosingCta() {
       className="scroll-mt-16 bg-panel py-16 text-on-panel md:py-24"
     >
       <Container className="text-center">
-        <SectionMarker index="05" className="justify-center text-on-panel-muted">
+        <SectionMarker index="06" className="justify-center text-on-panel-muted">
           Closing call
         </SectionMarker>
 

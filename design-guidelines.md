@@ -100,17 +100,20 @@ The radio is the metaphor: you *tune in* to what is happening in your community.
 
 | Role | Font | Fallback | Notes |
 |------|------|----------|-------|
+| Hero display | **Quicksand** (variable 300–700) | `"Fraunces", Georgia, serif` | Loaded from Google Fonts; used for the one big hero headline only |
 | Display / headlines | **Fraunces** (Light and Regular, plus Italic) | `Georgia, serif` | Warm old-style serif, close to the reference mood |
 | UI and body | **Public Sans** | `system-ui, sans-serif` | Highly legible, civic-friendly |
 | Data / numbers (optional) | **IBM Plex Mono** | `ui-monospace, monospace` | Vote counts, dates, reference IDs |
 
-All three are free on Google Fonts. To swap a font, change only the `--font-*` tokens.
+All four are free on Google Fonts. To swap a font, change only the `--font-*` tokens.
+Quicksand has no italic cut, so italics in the hero are synthesised — accept that, or drop
+the italic rather than faking a slant elsewhere.
 
 ### 3.2 Type scale (mobile first)
 
 | Style | Font | Size / line height | Weight | Usage |
 |-------|------|--------------------|--------|-------|
-| Display | Fraunces | 40 / 44 px | 300 | Hero headline only |
+| Display | Quicksand | 40 / 44 px | 300 | Hero headline only |
 | H1 | Fraunces | 32 / 38 px | 400 | Screen titles |
 | H2 | Fraunces | 24 / 30 px | 400 | Section titles |
 | H3 | Public Sans | 18 / 26 px | 600 | Card titles |
@@ -120,6 +123,7 @@ All three are free on Google Fonts. To swap a font, change only the `--font-*` t
 | Italic accent | Fraunces Italic | 18 / 26 px | 400 | Taglines, pull quotes |
 
 Desktop: scale Display to 72/76 and H1 to 44/50; everything else stays the same.
+In the shipped build the hero display is set at 64/68 on desktop so the two-line break holds.
 
 ### 3.3 Typography rules
 

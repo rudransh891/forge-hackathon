@@ -39,7 +39,7 @@ export function Hero() {
           <h1
             id="hero-title"
             data-reveal
-            className="mt-5 text-[40px] leading-[1.04] font-light tracking-[-0.02em] text-ink md:text-[64px] md:leading-[68px]"
+            className="mt-5 font-headline text-[40px] leading-[1.04] font-light tracking-[-0.01em] text-ink md:text-[64px] md:leading-[68px]"
           >
             take your
             <br />

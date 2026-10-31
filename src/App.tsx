@@ -4,6 +4,7 @@ import { PulseStrip } from '@/components/site/pulse-strip'
 import { TrendingIssues } from '@/components/site/trending-issues'
 import { HowItWorks } from '@/components/site/how-it-works'
 import { FeaturedPoll } from '@/components/site/featured-poll'
+import { Faq } from '@/components/site/faq'
 import { ClosingCta } from '@/components/site/closing-cta'
 import { SiteFooter } from '@/components/site/site-footer'
 
@@ -24,6 +25,7 @@ function App() {
         <TrendingIssues />
         <HowItWorks />
         <FeaturedPoll />
+        <Faq />
         <ClosingCta />
       </main>
 
