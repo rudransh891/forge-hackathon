@@ -19,15 +19,19 @@ export function SectionMarker({
   index,
   children,
   className,
+  numberClassName,
+  dividerClassName,
 }: {
   index: string
   children: ReactNode
   className?: string
+  numberClassName?: string
+  dividerClassName?: string
 }) {
   return (
-    <p className={cn('label-caps flex items-center gap-2 text-ink-muted', className)}>
-      <span className="font-mono tracking-normal">{index}</span>
-      <span aria-hidden className="h-3 w-px bg-current opacity-50" />
+    <p className={cn('label-caps flex items-center gap-2', className)}>
+      <span className={cn('font-mono tracking-normal', numberClassName)}>{index}</span>
+      <span aria-hidden className={cn('h-3 w-px', dividerClassName)} />
       <span>{children}</span>
     </p>
   )

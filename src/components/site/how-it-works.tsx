@@ -23,31 +23,37 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-title"
-      className="scroll-mt-16 border-b border-hairline bg-cream-50/70 py-14 md:py-20"
+      className="scroll-mt-16 border-b border-sand-300 bg-cream-100 py-14 md:py-20"
     >
       <Container>
-        <SectionMarker index="03">How it works</SectionMarker>
+        <SectionMarker
+          index="03"
+          className="text-brown-600"
+          numberClassName="text-coral-700"
+          dividerClassName="bg-sand-300"
+        >
+          How it works
+        </SectionMarker>
         <h2
           id="how-title"
-          className="mt-4 max-w-[22ch] text-[32px] leading-[1.1] text-ink md:text-[44px] md:leading-[50px]"
+          className="mt-4 max-w-[22ch] text-[32px] leading-[1.1] text-brown-900 md:text-[44px] md:leading-[50px]"
         >
-          Three steps to being heard
+          Three steps to <span className="text-coral-500">being heard</span>
         </h2>
 
         <ol className="mt-10 grid list-none gap-4 p-0 md:grid-cols-3">
           {STEPS.map((step) => (
-            <li
-              key={step.index}
-              className="rounded-xl border border-hairline bg-surface p-6"
-            >
+            <li key={step.index} className="border border-cream-300 bg-cream-50 p-6">
               <span
                 aria-hidden
-                className="grid size-11 place-items-center rounded-sm border border-hairline font-mono text-sm text-ink-muted"
+                className="grid size-11 place-items-center bg-brown-900 font-mono text-sm text-coral-300"
               >
                 {step.index}
               </span>
-              <h3 className="mt-5 font-sans text-lg font-semibold text-ink">{step.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-ink-muted">{step.body}</p>
+              <h3 className="mt-5 font-sans text-lg font-semibold text-brown-900">
+                {step.title}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-brown-600">{step.body}</p>
             </li>
           ))}
         </ol>

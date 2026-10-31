@@ -59,16 +59,27 @@ function StatusBadge({ status }: { status: Status }) {
 
 export function TrendingIssues() {
   return (
-    <section id="issues" aria-labelledby="issues-title" className="scroll-mt-16 border-b border-hairline py-14 md:py-20">
+    <section
+      id="issues"
+      aria-labelledby="issues-title"
+      className="scroll-mt-16 border-b border-sand-300 bg-brown-900 py-14 md:py-20"
+    >
       <Container>
-        <SectionMarker index="02">Trending issues</SectionMarker>
+        <SectionMarker
+          index="02"
+          className="text-sand-300"
+          numberClassName="text-coral-300"
+          dividerClassName="bg-sand-300"
+        >
+          Trending issues
+        </SectionMarker>
         <h2
           id="issues-title"
-          className="mt-4 max-w-[20ch] text-[32px] leading-[1.1] text-ink md:text-[44px] md:leading-[50px]"
+          className="mt-4 max-w-[20ch] text-[32px] leading-[1.1] text-cream-100 md:text-[44px] md:leading-[50px]"
         >
-          What your neighbors are talking about
+          What your neighbors are <span className="text-coral-300">talking about</span>
         </h2>
-        <p className="mt-3 max-w-[58ch] text-ink-muted">
+        <p className="mt-3 max-w-[58ch] text-on-panel-muted">
           The issues drawing the most signal this week in Ward 7. Every one of them is
           open for comment.
         </p>
@@ -77,34 +88,34 @@ export function TrendingIssues() {
           {ISSUES.map((issue) => (
             <li key={issue.title}>
               <article
-                className={`flex h-full flex-col overflow-hidden rounded-xl border border-hairline bg-surface ${
+                className={`flex h-full flex-col overflow-hidden bg-cream-50 ${
                   issue.status === 'urgent' ? 'border-l-4 border-l-coral-700' : ''
                 }`}
               >
-                <div className="aspect-[4/3] w-full border-b border-hairline">
+                <div className="aspect-[4/3] w-full bg-sand-100">
                   <issue.Art className="h-full w-full" />
                 </div>
 
                 <div className="flex flex-1 flex-col gap-3 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <StatusBadge status={issue.status} />
-                    <span className="text-xs text-ink-muted">
+                    <span className="text-xs text-brown-600">
                       {issue.category} · {issue.locality}
                     </span>
                   </div>
 
-                  <h3 className="font-sans text-lg leading-[26px] font-semibold text-ink">
+                  <h3 className="font-sans text-lg leading-[26px] font-semibold text-brown-900">
                     {issue.title}
                   </h3>
 
-                  <p className="text-sm leading-6 text-ink-muted">{issue.summary}</p>
+                  <p className="text-sm leading-6 text-brown-600">{issue.summary}</p>
 
                   <a
                     href="#issues"
-                    className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold text-green-700 underline underline-offset-4 hover:text-brown-900"
+                    className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4"
                   >
                     View discussion
-                    <ArrowRight aria-hidden className="size-4" />
+                    <ArrowRight aria-hidden className="size-4 text-coral-500" />
                   </a>
                 </div>
               </article>
@@ -114,7 +125,7 @@ export function TrendingIssues() {
 
         <Button
           variant="outline"
-          className="mt-10 h-12 rounded-md border-green-700 bg-transparent px-5 text-[15px] font-semibold text-green-700 hover:bg-green-100/60 hover:text-brown-900"
+          className="mt-10 h-12 rounded-md border border-coral-300 bg-transparent px-5 text-[15px] font-semibold text-coral-300 hover:bg-coral-300 hover:text-brown-900"
         >
           Browse all issues
           <ArrowRight aria-hidden className="size-4" />

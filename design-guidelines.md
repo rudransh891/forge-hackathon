@@ -43,18 +43,32 @@ The radio is the metaphor: you *tune in* to what is happening in your community.
 
 | Token | Hex | Role |
 |-------|-----|------|
-| `--color-cream-50` | `#FDF8EA` | Page highlight, input fill |
+| `--color-cream-50` | `#FDF8EA` | Page highlight, input fill, cards |
 | `--color-cream-100` | `#FAF0D7` | **Main background** |
-| `--color-cream-300` | `#E9D9B0` | Borders, hairlines, dividers |
+| `--color-cream-300` | `#E9D9B0` | Soft borders, step-card edges |
+| `--color-sand-100` | `#EBDDC8` | Illustration beds (all three card arts) |
+| `--color-sand-300` | `#D9C3A8` | Row dividers, disabled fills, muted text on brown |
+| `--color-brown-950` | `#2B1810` | Footer, deeper than the standard panel |
 | `--color-brown-900` | `#3E2419` | **Primary text, dark panels** |
+| `--color-brown-700` | `#5A3A2C` | Panel dividers, bar tracks, illustration linework |
 | `--color-brown-600` | `#6B4A3A` | Secondary text on cream |
-| `--color-green-700` | `#1F4A3C` | Gravitas color: primary buttons, official badges, headers |
+| `--color-green-700` | `#1F4A3C` | Action color, **cream sections only** |
 | `--color-green-100` | `#DCE8DF` | Success / confirmed background |
-| `--color-teal-400` | `#6BC4BF` | Info, selected row, ticker strip |
-| `--color-teal-100` | `#DDF1EF` | Info background |
-| `--color-coral-500` | `#D9482F` | Urgent fills, large accents, thin frame |
-| `--color-coral-700` | `#B8361F` | Urgent **text** and icons on cream |
-| `--color-amber-500` | `#C98A1B` | Warning fills (pair with brown text) |
+| `--color-teal-400` | `#6BC4BF` | Stats strip, selected row, focus ring |
+| `--color-teal-100` | `#DDF1EF` | Info background, Open badge |
+| `--color-coral-100` | `#FBE3DB` | Reserved, pale coral wash |
+| `--color-coral-300` | `#F2A58F` | Brand coral **on brown**, 3:1 pairs |
+| `--color-coral-500` | `#D9482F` | Brand coral on cream: accents 24px+, the frame, illustration accents |
+| `--color-coral-700` | `#B8361F` | Urgent pill, small coral text on cream |
+| `--color-amber-500` | `#C98A1B` | Warning fills (pair with brown-900 text) |
+
+**Coral has two jobs and they never mix.** BRAND coral is accent words in headlines (24px+),
+section numbers, dots, icons, underlines and illustration fills — never a pill, never a
+warning icon, never a card edge. STATUS coral is urgent only: coral-700 pill + warning icon
++ 4px left edge on the card.
+
+**Green-700 is an action colour on cream sections only.** Anything sitting on a brown panel
+takes coral-300 for actions, or sand-300 / cream-100 for secondary buttons.
 
 ### 2.2 Semantic tokens (use these in components)
 
@@ -338,12 +352,18 @@ Labels style, square tag (radius 0), always include an icon or text, never color
   --color-cream-50:  #FDF8EA;
   --color-cream-100: #FAF0D7;
   --color-cream-300: #E9D9B0;
+  --color-sand-100:  #EBDDC8;
+  --color-sand-300:  #D9C3A8;
+  --color-brown-950: #2B1810;
   --color-brown-900: #3E2419;
+  --color-brown-700: #5A3A2C;
   --color-brown-600: #6B4A3A;
   --color-green-700: #1F4A3C;
   --color-green-100: #DCE8DF;
   --color-teal-400:  #6BC4BF;
   --color-teal-100:  #DDF1EF;
+  --color-coral-100: #FBE3DB;
+  --color-coral-300: #F2A58F;
   --color-coral-500: #D9482F;
   --color-coral-700: #B8361F;
   --color-amber-500: #C98A1B;

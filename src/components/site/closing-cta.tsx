@@ -6,18 +6,23 @@ export function ClosingCta() {
     <section
       id="about"
       aria-labelledby="cta-title"
-      className="scroll-mt-16 bg-panel py-16 text-on-panel md:py-24"
+      className="scroll-mt-16 bg-brown-900 py-16 text-cream-100 md:py-24"
     >
       <Container className="text-center">
-        <SectionMarker index="06" className="justify-center text-on-panel-muted">
+        <SectionMarker
+          index="06"
+          className="justify-center text-sand-300"
+          numberClassName="text-coral-300"
+          dividerClassName="bg-sand-300"
+        >
           Closing call
         </SectionMarker>
 
         <h2
           id="cta-title"
-          className="mx-auto mt-5 max-w-[16ch] text-[34px] leading-[1.05] font-light text-on-panel md:text-[60px] md:leading-[64px]"
+          className="mx-auto mt-5 max-w-[16ch] text-[34px] leading-[1.05] font-light text-cream-100 md:text-[60px] md:leading-[64px]"
         >
-          Join your community’s conversation
+          Join your community’s <span className="text-coral-300">conversation</span>
         </h2>
 
         <p className="mx-auto mt-5 max-w-[58ch] text-on-panel-muted">
@@ -26,12 +31,12 @@ export function ClosingCta() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button className="h-12 rounded-md px-6 text-[15px] font-semibold">
+          <Button className="h-12 rounded-md bg-coral-300 px-6 text-[15px] font-semibold text-brown-900 hover:bg-cream-100 hover:text-brown-900">
             Create free account
           </Button>
           <Button
             variant="outline"
-            className="h-12 rounded-md border-on-panel/40 bg-transparent px-6 text-[15px] font-semibold text-on-panel hover:bg-cream-50/10 hover:text-on-panel"
+            className="h-12 rounded-md border border-sand-300 bg-transparent px-6 text-[15px] font-semibold text-cream-100 hover:border-coral-300 hover:bg-transparent hover:text-cream-100"
           >
             Learn more
           </Button>

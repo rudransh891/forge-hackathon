@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { Minus, Plus } from 'lucide-react'
 import { Container, SectionMarker } from '@/components/site/layout'
 
 const FAQS = [
@@ -25,33 +25,40 @@ export function Faq() {
     <section
       id="faq"
       aria-labelledby="faq-title"
-      className="scroll-mt-16 border-b border-hairline py-14 md:py-20"
+      className="scroll-mt-16 border-b border-sand-300 bg-cream-100 py-14 md:py-20"
     >
       <Container className="grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
         <div>
-          <SectionMarker index="05">FAQ</SectionMarker>
+          <SectionMarker
+            index="05"
+            className="text-brown-600"
+            numberClassName="text-coral-700"
+            dividerClassName="bg-sand-300"
+          >
+            FAQ
+          </SectionMarker>
           <h2
             id="faq-title"
-            className="mt-4 max-w-[18ch] text-[32px] leading-[1.1] text-ink md:text-[40px] md:leading-[46px]"
+            className="mt-4 max-w-[18ch] text-[32px] leading-[1.1] text-brown-900 md:text-[40px] md:leading-[46px]"
           >
-            Questions people ask before they post
+            Questions people ask <span className="text-coral-500">before they post</span>
           </h2>
         </div>
 
-        <div className="border-t border-hairline">
+        <div className="border-t border-sand-300">
           {FAQS.map((item) => (
             <details
               key={item.q}
-              className="group border-b border-hairline py-5 [&_summary::-webkit-details-marker]:hidden"
+              className="group border-b border-sand-300 py-5 open:border-b-2 open:border-b-brown-900 open:bg-cream-50 [&_summary::-webkit-details-marker]:hidden"
             >
-              <summary className="flex list-none cursor-pointer items-center justify-between gap-6 font-sans text-lg font-semibold text-ink">
+              <summary className="flex list-none cursor-pointer items-center justify-between gap-6 font-sans text-lg font-semibold text-brown-900">
                 {item.q}
-                <Plus
-                  aria-hidden
-                  className="size-5 shrink-0 text-ink-muted transition-transform duration-[var(--motion-fast)] group-open:rotate-45"
-                />
+                <span aria-hidden className="relative size-5 shrink-0">
+                  <Plus className="size-5 text-coral-500 group-open:hidden" />
+                  <Minus className="hidden size-5 text-coral-700 group-open:block" />
+                </span>
               </summary>
-              <p className="mt-3 max-w-[58ch] text-ink-muted">{item.a}</p>
+              <p className="mt-3 max-w-[58ch] text-brown-600">{item.a}</p>
             </details>
           ))}
         </div>

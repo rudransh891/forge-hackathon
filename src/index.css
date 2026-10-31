@@ -17,12 +17,18 @@
   --color-cream-50: #fdf8ea;
   --color-cream-100: #faf0d7;
   --color-cream-300: #e9d9b0;
+  --color-sand-100: #ebddc8;
+  --color-sand-300: #d9c3a8;
+  --color-brown-950: #2b1810;
   --color-brown-900: #3e2419;
+  --color-brown-700: #5a3a2c;
   --color-brown-600: #6b4a3a;
   --color-green-700: #1f4a3c;
   --color-green-100: #dce8df;
   --color-teal-400: #6bc4bf;
   --color-teal-100: #ddf1ef;
+  --color-coral-100: #fbe3db;
+  --color-coral-300: #f2a58f;
   --color-coral-500: #d9482f;
   --color-coral-700: #b8361f;
   --color-amber-500: #c98a1b;
@@ -176,8 +182,8 @@
     outline-offset: 2px;
   }
   ::selection {
-    background: var(--color-teal-400);
-    color: var(--color-brown-900);
+    background: var(--color-coral-300);
+    color: var(--color-brown-950);
   }
 }
 
