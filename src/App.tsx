@@ -12,12 +12,14 @@ import { AuthModal } from '@/components/auth/AuthModal'
 import { AuthModalProvider } from '@/components/auth/AuthModalProvider'
 import { FeedPage } from '@/components/feed/FeedPage'
 import { ReportPage } from '@/components/report/ReportPage'
+import { ReportSubmitPage } from '@/components/report/ReportSubmitPage'
 import { feedNavigation } from '@/components/report/feedNavigation'
 
 /**
  * No router in this project: the feed is mounted from the URL hash so the
  * landing page stays a single static page and nothing new is installed.
- * "#/issues" -> feed, "#/issues/{id}" -> report, anything else -> landing.
+ * "#/issues" -> feed, "#/issues/{id}" -> report, "#/submit" -> report form,
+ * anything else -> landing.
  */
 function App() {
   const [hash, setHash] = useState(() => window.location.hash)
@@ -39,6 +41,7 @@ function App() {
   const reportMatch = hash.match(/^#\/issues\/([^/]+)$/)
   const reportId = reportMatch ? reportMatch[1] : null
   const showFeed = hash === '#/issues'
+  const showSubmit = hash === '#/submit'
 
   return (
     <AuthModalProvider>
@@ -61,6 +64,8 @@ function App() {
         <ReportPage key={reportId} id={reportId} />
       ) : showFeed ? (
         <FeedPage />
+      ) : showSubmit ? (
+        <ReportSubmitPage />
       ) : (
         <main id="top">
           <Hero />

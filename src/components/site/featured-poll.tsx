@@ -2,10 +2,15 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 
+/**
+ * The featured poll. There is no poll table behind it yet, so it counts the
+ * vote in this browser only and says so. The same three options as the feed's
+ * PollCard, so the two never disagree about the question.
+ */
 const OPTIONS = [
-  { id: 'keep', label: 'Keep the lane as it is', votes: 812 },
-  { id: 'widen', label: 'Widen it to two lanes', votes: 286 },
-  { id: 'remove', label: 'Remove it and restore parking', votes: 402 },
+  { id: 'roads', label: 'Potholes and road damage', votes: 0 },
+  { id: 'garbage', label: 'Garbage collection', votes: 0 },
+  { id: 'lights', label: 'Streetlights not working', votes: 0 },
 ]
 
 export function FeaturedPoll() {
@@ -16,8 +21,8 @@ export function FeaturedPoll() {
     (option) => option.votes + (voted && selected === option.id ? 1 : 0),
   )
   const total = counts.reduce((sum, count) => sum + count, 0)
-  const leader = Math.max(...counts)
-  const pct = (votes: number) => Math.round((votes / total) * 100)
+  const leader = total > 0 ? Math.max(...counts) : -1
+  const pct = (votes: number) => (total > 0 ? Math.round((votes / total) * 100) : 0)
 
   return (
     <section
@@ -33,14 +38,14 @@ export function FeaturedPoll() {
             numberClassName="text-coral-700"
             dividerClassName="bg-sand-300"
           >
-            Featured poll
+            Poll · not connected yet
           </SectionMarker>
           <h2
             id="poll-title"
             className="mt-4 max-w-[24ch] text-[28px] leading-[1.15] text-brown-900 md:text-[34px] md:leading-[40px]"
           >
-            Should the city keep the Elm Street{' '}
-            <span className="text-coral-500">bike lane</span>?
+            Which fix should the pilot chase{' '}
+            <span className="text-coral-500">first this week</span>?
           </h2>
 
           <form
@@ -100,24 +105,24 @@ export function FeaturedPoll() {
 
             <p aria-live="polite" className="mt-3 text-sm text-brown-600">
               {voted
-                ? 'Thanks — your vote is counted.'
-                : `${total.toLocaleString('en-US')} residents have voted. Results update live.`}
+                ? 'Your vote is counted in this browser only.'
+                : 'This poll has no backend behind it yet; the vote stays on this page.'}
             </p>
           </form>
         </div>
 
         <div className="self-start bg-brown-900 p-6">
           <div className="flex items-baseline justify-between gap-4">
-            <h3 className="font-sans text-sm font-semibold text-cream-100">Live results</h3>
+            <h3 className="font-sans text-sm font-semibold text-cream-100">Results</h3>
             <span className="font-mono text-sm text-on-panel-muted">
-              {total.toLocaleString('en-US')} votes
+              {total.toLocaleString('en-IN')} {total === 1 ? 'vote' : 'votes'}
             </span>
           </div>
 
           <ul className="mt-6 list-none space-y-5 p-0">
             {OPTIONS.map((option, index) => {
               const votes = counts[index]
-              const isLeader = votes === leader
+              const isLeader = leader >= 0 && votes === leader
               return (
                 <li key={option.id}>
                   <div className="flex items-baseline justify-between gap-4 text-sm">
@@ -137,7 +142,8 @@ export function FeaturedPoll() {
 
           <p className="mt-6 text-xs leading-5 text-on-panel-muted">
             Percentages are shown next to every bar, so the result never relies on colour
-            alone. Polls close Friday, 7 November at 6 PM.
+            alone. Nothing is stored on the server, and there is no closing date until the
+            poll is connected.
           </p>
         </div>
       </Container>

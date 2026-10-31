@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useAuthModal } from '@/components/auth/AuthModalProvider'
 import { BriefRow } from './BriefRow'
 import { FeedHeader } from './FeedHeader'
 import { FeedRail } from './FeedRail'
@@ -9,14 +8,13 @@ import { PollCard } from './PollCard'
 import { ReportButton } from './ReportButton'
 import { ReportCard } from './ReportCard'
 import { AlertIcon } from './icons'
-import { briefThreshold, labels } from './feedConfig'
+import { briefThreshold, labels, ward } from './feedConfig'
 import { fetchNotices, fetchPoll } from './feedService'
 import { useFeed } from './useFeed'
 import { feedNavigation } from '@/components/report/feedNavigation'
 
 export function FeedPage() {
   const feed = useFeed()
-  const { openAuthModal } = useAuthModal()
   const [notices, setNotices] = useState([])
   const [poll, setPoll] = useState(null)
   const sentinel = useRef(null)
@@ -73,7 +71,10 @@ export function FeedPage() {
   const briefs = rest.filter((report) => !report.photo && report.supporters < briefThreshold)
   const standards = rest.filter((report) => report.photo || report.supporters >= briefThreshold)
 
-  const openReport = () => openAuthModal('signup')
+  // Reporting needs a photo and coordinates, not an account: it has its own page.
+  const openReport = () => {
+    window.location.hash = '#/submit'
+  }
 
   return (
     <>
@@ -86,7 +87,7 @@ export function FeedPage() {
       <NoticesTicker notices={notices} />
 
       <main className="mx-auto w-full max-w-[1120px] px-4 pb-24 lg:px-0 lg:pb-16">
-        <h1 className="sr-only">Reports in Ward 7</h1>
+        <h1 className="sr-only">Reports in {ward}</h1>
         <p aria-live="polite" className="sr-only">
           {feed.announcement}
         </p>
@@ -100,7 +101,7 @@ export function FeedPage() {
                 <LeadReport
                   report={lead}
                   supported={Boolean(feed.supported[lead.id])}
-                  onSupport={() => feed.toggleSupport(lead.id)}
+                  onSupport={() => feed.toggleSupport(lead.id, lead.supporters)}
                 />
               </div>
             ) : null}
@@ -114,7 +115,7 @@ export function FeedPage() {
                   <ReportCard
                     report={report}
                     supported={Boolean(feed.supported[report.id])}
-                    onSupport={() => feed.toggleSupport(report.id)}
+                    onSupport={() => feed.toggleSupport(report.id, report.supporters)}
                   />
                   {index === 2 && poll ? (
                     <div className="pb-4 lg:hidden">
@@ -139,7 +140,7 @@ export function FeedPage() {
                       key={report.id}
                       report={report}
                       supported={Boolean(feed.supported[report.id])}
-                      onSupport={() => feed.toggleSupport(report.id)}
+                      onSupport={() => feed.toggleSupport(report.id, report.supporters)}
                     />
                   ))}
                 </ul>

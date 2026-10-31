@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 import { useAuthModal } from '@/components/auth/AuthModalProvider'
+import { pilotCity } from '@/components/feed/feedConfig'
 
 export function ClosingCta() {
   const { openAuthModal } = useAuthModal()
@@ -25,12 +26,13 @@ export function ClosingCta() {
           id="cta-title"
           className="mx-auto mt-5 max-w-[16ch] text-[34px] leading-[1.05] font-light text-cream-100 md:text-[60px] md:leading-[64px]"
         >
-          Join your community’s <span className="text-coral-300">conversation</span>
+          Join {pilotCity}’s <span className="text-coral-300">conversation</span>
         </h2>
 
         <p className="mx-auto mt-5 max-w-[58ch] text-on-panel-muted">
-          Non-partisan, built on public records. Every issue shows where its data came
-          from, and we never sell what you tell us.
+          A non-partisan pilot built on OpenStreetMap, Open-Meteo and an open vision model.
+          Every report shows the evidence behind its score, and nothing claims a department
+          acted when it did not.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

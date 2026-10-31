@@ -1,4 +1,5 @@
 import { feedNavigation } from '@/components/report/feedNavigation'
+import { supportCount } from '@/components/report/reportStore'
 import { CommentIcon } from './icons'
 import { ReportPhoto } from './ReportPhoto'
 import { StatusTag, VerificationMark } from './StatusTag'
@@ -35,7 +36,7 @@ export function LeadReport({ report, supported, onSupport }) {
             <StatusTag status={report.status} urgent={report.urgent} />
             <span className="sr-only">
               {report.category}, {report.locality}, reported {report.ageDays} days ago,{' '}
-              {report.verification === 'verified' ? 'verified by ward office' : 'unverified'}
+              {report.verification === 'verified' ? 'verified' : 'unverified'}
             </span>
             <span aria-hidden>
               {report.category} · {report.locality} · {report.ageDays}d
@@ -63,7 +64,7 @@ export function LeadReport({ report, supported, onSupport }) {
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 lg:mt-auto">
             <p className="flex items-center gap-3 text-[12px] text-on-panel-muted">
-              <span>{report.supporters + (supported ? 1 : 0)} supporters</span>
+              <span>{supportCount(report.id, report.supporters)} supporters</span>
               <span className="inline-flex items-center gap-1">
                 <CommentIcon size={13} className="text-coral-300" />
                 {report.comments} comments

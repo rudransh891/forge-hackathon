@@ -5,6 +5,7 @@ import { ArrowRight, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 import { RadioIllustration } from '@/components/site/illustrations'
+import { pilotCity } from '@/components/feed/feedConfig'
 
 export function Hero() {
   const scope = useRef<HTMLDivElement>(null)
@@ -37,7 +38,7 @@ export function Hero() {
           >
             <span className="inline-flex items-center gap-1.5">
               <Radio aria-hidden className="size-3.5 text-coral-500" />
-              On the air — Ward 7
+              On the air — {pilotCity}
             </span>
           </SectionMarker>
 
@@ -48,13 +49,13 @@ export function Hero() {
           >
             take your
             <br />
-            community’s{' '}
+            city’s{' '}
             <em className="italic font-headline font-[350] text-coral-500">pulse</em>
           </h1>
 
           <p data-reveal className="mt-6 max-w-[52ch] text-lg leading-relaxed text-brown-600">
-            See what residents are reporting, say your piece on the issues that are
-            open right now, and track what actually gets fixed — ward by ward.
+            See what residents are reporting in {pilotCity}, support the ones that matter
+            to you, and follow the proposed response time on every one of them.
           </p>
 
           <form
@@ -63,10 +64,11 @@ export function Hero() {
             onSubmit={(event) => {
               event.preventDefault()
               setChecked(area.trim())
+              window.location.hash = '#/issues'
             }}
           >
             <label htmlFor="area" className="text-sm font-semibold text-brown-900">
-              Your ZIP code or city
+              Your locality in {pilotCity}
             </label>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <input
@@ -74,21 +76,21 @@ export function Hero() {
                 name="area"
                 value={area}
                 onChange={(event) => setArea(event.target.value)}
-                placeholder="e.g. 60607 or Chicago"
-                autoComplete="postal-code"
+                placeholder="e.g. Civil Lines or Kydganj"
+                autoComplete="address-level2"
                 className="h-12 min-w-0 flex-1 border border-brown-600 bg-cream-50 px-3 text-base text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700"
               />
               <Button
                 type="submit"
                 className="h-12 bg-green-700 px-5 text-[15px] font-semibold text-cream-50"
               >
-                See my area
+                See reports
               </Button>
             </div>
             <p aria-live="polite" className="mt-3 text-sm text-brown-600">
               {checked
-                ? `Showing hotspots near ${checked}. Three issues need attention this week.`
-                : 'Enter a location to see the issues closest to you.'}
+                ? `Opening the ${pilotCity} feed. Area filtering is not available yet, so every report in the city is listed.`
+                : 'The feed covers all of Prayagraj. Reports are matched to a locality from their coordinates.'}
             </p>
           </form>
 
@@ -107,7 +109,7 @@ export function Hero() {
             <RadioIllustration />
             <p className="label-caps flex items-center gap-2 text-sand-300">
               <span aria-hidden className="size-1.5 bg-coral-300" />
-              Ward 7 · on the air
+              {pilotCity} · on the air
             </p>
           </div>
         </div>

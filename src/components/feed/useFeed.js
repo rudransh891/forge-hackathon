@@ -97,8 +97,8 @@ export function useFeed() {
     setAnnouncement('')
   }, [])
 
-  const toggleSupport = useCallback((id) => {
-    const nowSupported = toggleSupportInStore(id)
+  const toggleSupport = useCallback((id, baseline = 0) => {
+    const nowSupported = toggleSupportInStore(id, baseline)
     setAnnouncement(nowSupported ? supportCopy.addAnnouncement : supportCopy.removeAnnouncement)
   }, [])
 

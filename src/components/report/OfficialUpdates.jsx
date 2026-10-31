@@ -17,15 +17,22 @@ function BuildingIcon() {
   )
 }
 
-/** Official updates, newest first. Actions on brown are coral-300, never green. */
-export function OfficialUpdates({ updates }) {
+/**
+ * The report's status history, newest first.
+ *
+ * These entries are written by the pipeline itself (and by the citizen, when
+ * they answer the duplicate question). They are not messages from a government
+ * department, so the section says so and no entry is marked verified.
+ */
+export function OfficialUpdates({ updates, note }) {
   if (!updates || updates.length === 0) return null
 
   return (
     <section aria-labelledby="updates-heading">
       <h2 id="updates-heading" className="text-[16px] font-semibold text-brown-900">
-        Official updates
+        Status history
       </h2>
+      {note ? <p className="mt-1 max-w-[65ch] text-[12px] text-brown-600">{note}</p> : null}
       <div className="mt-3 flex flex-col gap-3">
         {updates.map((update) => (
           <article key={update.id} className="bg-brown-900 p-4">
@@ -34,7 +41,7 @@ export function OfficialUpdates({ updates }) {
                 <span className="text-coral-300">
                   <BuildingIcon />
                 </span>
-                Update from {update.author}
+                {update.author}
               </p>
               <span className="shrink-0 text-[12px] text-on-panel-muted">{update.dateLabel}</span>
             </div>
@@ -52,7 +59,7 @@ export function OfficialUpdates({ updates }) {
   )
 }
 
-/** Shown instead of the update block when the city has not responded yet. */
+/** Shown instead of the update block when the pipeline has recorded nothing. */
 export function NoResponseNote({ ageDays }) {
   if (ageDays <= noResponseNoteAfterDays) return null
   return (

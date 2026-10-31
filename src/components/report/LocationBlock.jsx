@@ -26,8 +26,13 @@ function MapThumb() {
   )
 }
 
-/** Address line + Map link, with an optional decorative map for the rail. */
-export function LocationBlock({ addressBlock, withMap = false }) {
+/**
+ * Address line + Map link, with an optional decorative map for the rail.
+ *
+ * The link opens OpenStreetMap at the report's coordinates. Before the merge it
+ * was `href="#"` with preventDefault, so the affordance did nothing.
+ */
+export function LocationBlock({ addressBlock, withMap = false, mapHref, coords }) {
   return (
     <section aria-label="Location">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -36,13 +41,18 @@ export function LocationBlock({ addressBlock, withMap = false }) {
           {addressBlock}
         </p>
         <a
-          href="#"
-          onClick={(event) => event.preventDefault()}
+          href={mapHref || '#/issues'}
+          target={mapHref ? '_blank' : undefined}
+          rel={mapHref ? 'noreferrer' : undefined}
           className="text-[14px] font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
         >
-          Map
+          {mapHref ? 'Open map' : 'Map'}
         </a>
       </div>
+
+      {coords ? (
+        <p className="mt-1 font-mono text-[12px] text-brown-600">{coords}</p>
+      ) : null}
 
       {withMap ? (
         <div className="mt-3 hidden lg:block">

@@ -15,15 +15,15 @@ export const views = {
     title: { lead: 'welcome', accent: 'back' },
     helper: 'Log in to report an issue, follow it, and see what gets fixed.',
     panel: {
-      title: { lead: 'the ward is', accent: 'listening' },
-      body: 'One account covers your reports, your polls and every update the ward office posts.',
+      title: { lead: 'the city is', accent: 'listening' },
+      body: 'One account would cover your reports, your polls and every update the city posts.',
     },
   },
   signup: {
     id: 'signup',
     tab: 'Sign up',
     title: { lead: 'join your', accent: 'community' },
-    helper: 'Create an account so the ward office knows who to reply to.',
+    helper: 'Create an account so the city knows who to reply to.',
     panel: {
       title: { lead: 'add your', accent: 'signal' },
       body: 'Neighbors already on the air report the small things before they become the big ones.',
@@ -53,7 +53,7 @@ export const views = {
 
 export const benefits = [
   'See what neighbors are reporting',
-  'Vote on open polls in your ward',
+  'Vote on open polls in your locality',
   'Track what actually gets fixed',
 ]
 

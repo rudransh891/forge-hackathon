@@ -1,26 +1,20 @@
-import { commentsByReport, notices, poll, reports } from './feedData'
+import { fetchFeedPage, fetchReportDetail, fetchNearby } from '@/lib/api'
 import { pageSize as defaultPageSize } from './feedConfig'
+import { notices, poll } from './feedData'
 
-const DELAY = 400
-
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
-function sortReports(items, sort) {
-  const copy = [...items]
-  if (sort === 'newest') {
-    return copy.sort((a, b) => a.ageDays - b.ageDays)
-  }
-  return copy.sort((a, b) => {
-    if (a.urgent !== b.urgent) return a.urgent ? -1 : 1
-    return b.supporters - a.supporters
-  })
-}
+/**
+ * The seam between the UI and the API. The exported names and return shapes are
+ * the ones the components already expect; the data now comes from FastAPI.
+ *
+ * Backend coverage as of this merge:
+ *   reports, a single report, nearby reports   -> real
+ *   notices, poll                              -> still local (no table behind them)
+ *   comments, flags, helpful votes             -> no table behind them
+ */
 
 /**
  * @param {{ category?: string, sort?: string, cursor?: string|null, pageSize?: number }} query
  * @returns {Promise<{ items: object[], nextCursor: string|null, total: number }>}
- *
- * TODO: replace with GET /api/wards/7/reports?category=&sort=&cursor=&pageSize=
  */
 export async function fetchReports({
   category = 'All',
@@ -28,98 +22,83 @@ export async function fetchReports({
   cursor = null,
   pageSize = defaultPageSize,
 } = {}) {
-  await wait(DELAY)
-  const filtered =
-    category === 'All' ? reports : reports.filter((report) => report.category === category)
-  const ordered = sortReports(filtered, sort)
-  const offset = cursor ? Number(cursor) : 0
-  const page = ordered.slice(offset, offset + pageSize)
-  const nextOffset = offset + page.length
-  const nextCursor = nextOffset < ordered.length ? String(nextOffset) : null
-  return { items: page, nextCursor, total: ordered.length }
+  const page = await fetchFeedPage({
+    category,
+    sort,
+    offset: cursor ? Number(cursor) : 0,
+    pageSize,
+  })
+  return {
+    items: page.items,
+    nextCursor: page.nextOffset === null ? null : String(page.nextOffset),
+    total: page.total,
+  }
 }
 
 /**
  * @returns {Promise<{ items: { id: string, label: string, href: string }[] }>}
- * TODO: GET /api/wards/7/notices
  */
 export async function fetchNotices() {
-  await wait(DELAY)
   return { items: notices }
 }
 
 /**
  * @returns {Promise<typeof poll>}
- * TODO: GET /api/wards/7/polls/active
  */
 export async function fetchPoll() {
-  await wait(DELAY)
   return poll
 }
 
 /**
- * @param {{ pollId: string, optionId: string }} payload
- * @returns {Promise<{ status: 'recorded', optionId: string }>}
- * TODO: POST /api/polls/:id/votes — for now the vote stays in React state.
+ * Polls have no table behind them, so a vote only lives in React state.
+ * @returns {Promise<{ status: 'not_configured' }>}
  */
-export async function votePoll({ pollId, optionId }) {
-  await wait(DELAY)
-  return { status: 'recorded', pollId, optionId }
+export async function votePoll(payload) {
+  void payload
+  return { status: 'not_configured' }
 }
 
 /**
  * @param {string} id
- * @returns {Promise<object|null>}
- * TODO: GET /api/reports/:id
+ * @returns {Promise<object|null>} null when the report does not exist
  */
 export async function fetchReport(id) {
-  await wait(350)
-  return reports.find((report) => report.id === id) ?? null
+  return fetchReportDetail(id)
 }
 
 /**
- * @param {string} id
- * @param {{ sort?: 'top'|'newest', offset?: number, limit?: number }} query
+ * @param {{ id: string, locality: string }} query
+ * @returns {Promise<object[]>}
+ */
+export async function fetchNearbyReports({ id, locality }) {
+  return fetchNearby({ id, locality })
+}
+
+/**
+ * Reports have no comments table yet, so this is always empty. The section
+ * still renders, with its own empty state.
  * @returns {Promise<{ items: object[], total: number }>}
- * TODO: GET /api/reports/:id/comments?sort=&offset=&limit=
  */
-export async function fetchComments(id, { sort = 'top', offset = 0, limit = 10 } = {}) {
-  await wait(DELAY)
-  const all = [...(commentsByReport[id] || [])]
-  if (sort === 'newest') all.reverse()
-  else all.sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.helpful - a.helpful)
-  return { items: all.slice(offset, offset + limit), total: all.length }
+export async function fetchComments(id, query = {}) {
+  void id
+  void query
+  return { items: [], total: 0 }
 }
 
-/**
- * @param {{ reportId: string, text: string }} payload
- * @returns {Promise<{ status: 'not_configured' }>}
- * TODO: POST /api/reports/:id/comments
- */
+/** @returns {Promise<{ status: 'not_configured' }>} */
 export async function postComment(payload) {
   void payload
-  await wait(DELAY)
   return { status: 'not_configured' }
 }
 
-/**
- * @param {{ commentId: string, reason: string }} payload
- * @returns {Promise<{ status: 'not_configured' }>}
- * TODO: POST /api/comments/:id/flags
- */
+/** @returns {Promise<{ status: 'not_configured' }>} */
 export async function flagComment(payload) {
   void payload
-  await wait(DELAY)
   return { status: 'not_configured' }
 }
 
-/**
- * @param {{ commentId: string, helpful: boolean }} payload
- * @returns {Promise<{ status: 'not_configured' }>}
- * TODO: POST /api/comments/:id/helpful
- */
+/** @returns {Promise<{ status: 'not_configured' }>} */
 export async function voteHelpful(payload) {
   void payload
-  await wait(DELAY)
   return { status: 'not_configured' }
 }

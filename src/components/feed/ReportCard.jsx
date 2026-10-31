@@ -1,4 +1,5 @@
 import { feedNavigation } from '@/components/report/feedNavigation'
+import { supportCount } from '@/components/report/reportStore'
 import { CommentIcon } from './icons'
 import { ReportPhoto } from './ReportPhoto'
 import { StatusTag, UpdateNote, VerificationMark } from './StatusTag'
@@ -25,7 +26,7 @@ export function ReportCard({ report, supported, onSupport }) {
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-brown-600">
             <StatusTag status={report.status} urgent={report.urgent} />
             <span className="sr-only">
-              {metaText(report)}, {report.verification === 'verified' ? 'verified by ward office' : 'unverified'}
+              {metaText(report)}, {report.verification === 'verified' ? 'verified' : 'unverified'}
             </span>
             <span aria-hidden>
               {report.category} · {report.locality} · {report.ageDays}d
@@ -68,7 +69,7 @@ export function ReportCard({ report, supported, onSupport }) {
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="flex items-center gap-3 text-[12px] text-brown-600">
-          <span>{report.supporters + (supported ? 1 : 0)} supporters</span>
+          <span>{supportCount(report.id, report.supporters)} supporters</span>
           <span className="inline-flex items-center gap-1">
             <CommentIcon size={13} className="text-coral-500" />
             {report.comments} comments

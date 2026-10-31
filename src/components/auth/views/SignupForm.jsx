@@ -104,7 +104,7 @@ export function SignupForm() {
           label="Full name"
           autoComplete="name"
           required
-          placeholder="Rae Whitfield"
+          placeholder="Aarti Verma"
           value={form.name}
           error={errors.name}
           onChange={(event) => setField('name', event.target.value)}

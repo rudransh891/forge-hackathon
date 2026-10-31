@@ -4,17 +4,17 @@ const STEPS = [
   {
     index: '1',
     title: 'Explore',
-    body: 'Open the map, pick a neighborhood, and read every issue that is already on file.',
+    body: 'Open the feed, filter by category, and read every report already on file in the city.',
   },
   {
     index: '2',
     title: 'Weigh in',
-    body: 'Follow an issue, add your own report, or vote on the poll in front of you.',
+    body: 'Support a report that matters to you, or file your own with a photo and your location.',
   },
   {
     index: '3',
     title: 'See impact',
-    body: 'Watch the status change as officials respond, and get a signal when it resolves.',
+    body: 'Follow the status, the score and the proposed response time as each report moves through the pipeline.',
   },
 ]
 

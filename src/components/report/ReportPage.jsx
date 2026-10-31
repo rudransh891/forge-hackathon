@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { useAuthModal } from '@/components/auth/AuthModalProvider'
-import { fetchReport } from '@/components/feed/feedService'
+import { fetchReport, fetchNearbyReports } from '@/components/feed/feedService'
 import { labels } from '@/components/feed/feedConfig'
-import { reports as allReports } from '@/components/feed/feedData'
+import { answerDuplicate, dateTimeLabel, reanalyse } from '@/lib/api'
 import { CommentsSection } from './CommentsSection'
 import { LocationBlock } from './LocationBlock'
 import { NearbyReports } from './NearbyReports'
@@ -17,43 +17,231 @@ import { TrackerHorizontal, TrackerVertical } from './StatusTracker'
 import { SupportBar } from './SupportBar'
 import { SupportBox } from './SupportBox'
 import { feedNavigation } from './feedNavigation'
-import { getSnapshot, subscribe, toggleSupport } from './reportStore'
+import { getSnapshot, subscribe, supportCount, toggleSupport } from './reportStore'
 
-function nearbyFor(report) {
-  const sameLocality = allReports.filter(
-    (candidate) => candidate.id !== report.id && candidate.locality === report.locality,
+/** A report is unfinished until it has a severity, so poll for a bounded time. */
+const POLL_MS = 3000
+const MAX_POLLS = 20
+
+const RETRYABLE = new Set(['needs_review', 'needs_better_photo'])
+
+function SectionHeading({ id, children }) {
+  return (
+    <h2 id={id} className="text-[16px] font-semibold text-brown-900">
+      {children}
+    </h2>
   )
-  const pool = sameLocality.length >= 2 ? sameLocality : allReports.filter((r) => r.id !== report.id)
-  return pool.slice(0, 2)
+}
+
+/**
+ * Severity, with the evidence behind it. The backend scores five factors and
+ * marks the result provisional when one of them could not be checked; showing
+ * only the level would hide that.
+ */
+function SeveritySection({ report, onReanalyse, busy }) {
+  const severity = report.severity
+  const canRetry = RETRYABLE.has(report.rawStatus)
+
+  const retry = canRetry ? (
+    <button
+      type="button"
+      onClick={onReanalyse}
+      disabled={busy}
+      className="mt-3 h-11 border border-brown-600 px-4 text-[13px] font-semibold text-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:text-brown-600"
+    >
+      {busy ? 'Re-analysing…' : 'Analyse again'}
+    </button>
+  ) : null
+
+  if (!severity) {
+    return (
+      <section aria-labelledby="severity-heading" className="mt-6 bg-cream-50 p-4">
+        <SectionHeading id="severity-heading">Severity</SectionHeading>
+        <p className="mt-1 text-[14px] text-brown-600">
+          Not scored yet. A score needs a readable photo, and the road and nearby
+          places around it.
+        </p>
+        {retry}
+      </section>
+    )
+  }
+
+  const factors = severity.factors ? Object.entries(severity.factors) : []
+  const level = severity.level ? severity.level.charAt(0).toUpperCase() + severity.level.slice(1) : 'Unscored'
+
+  return (
+    <section aria-labelledby="severity-heading" className="mt-6 bg-cream-50 p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <SectionHeading id="severity-heading">Severity</SectionHeading>
+        <p className="font-mono text-[13px] text-brown-600">
+          {severity.score ?? '—'}/100 · {severity.coverage ?? 'partial'}
+        </p>
+      </div>
+
+      <p className="mt-1 text-[15px] text-brown-900">
+        <span className="font-semibold">{level}</span>
+        {severity.uncapped_level && severity.uncapped_level !== severity.level ? (
+          <span className="text-brown-600">
+            {' '}
+            (evidence would have reached {severity.uncapped_level})
+          </span>
+        ) : null}
+      </p>
+
+      {severity.provisional ? (
+        <p className="mt-2 border-l-4 border-coral-500 pl-3 text-[13px] text-brown-900">
+          <span className="font-semibold">Provisional.</span> Some data could not be
+          checked, so the score is capped at medium
+          {severity.missing?.length ? `: ${severity.missing.join(', ')}` : '.'}
+        </p>
+      ) : null}
+
+      {severity.reason ? (
+        <p className="mt-2 text-[14px] leading-6 text-brown-900">{severity.reason}</p>
+      ) : null}
+
+      {factors.length ? (
+        <dl className="mt-3 grid gap-1 text-[13px]">
+          {factors.map(([name, factor]) => (
+            <div key={name} className="flex gap-2">
+              <dt className="w-[92px] shrink-0 font-medium text-brown-900">{name}</dt>
+              <dd className="min-w-0 flex-1 text-brown-600">
+                {factor.state === 'scored'
+                  ? `${factor.points}/${factor.max}`
+                  : factor.state === 'missing'
+                    ? 'not checked'
+                    : 'not applicable'}
+                {' · '}
+                {factor.note}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
+      {severity.deadline_at ? (
+        <p className="mt-3 text-[13px] text-brown-600">
+          Proposed response time: {dateTimeLabel(severity.deadline_at)}.
+          {severity.deadline_note ? ` ${severity.deadline_note}.` : ''}
+        </p>
+      ) : null}
+
+      {retry}
+    </section>
+  )
+}
+
+/**
+ * The one question the pipeline genuinely needs an answer to: is this the same
+ * problem as an older nearby report? Routing waits on it.
+ */
+function DuplicatePrompt({ report, onAnswer, busy }) {
+  const suggestion = report.duplicate
+  if (!suggestion || suggestion.response) return null
+
+  return (
+    <section aria-labelledby="duplicate-heading" className="mt-6 border-2 border-brown-900 p-4">
+      <SectionHeading id="duplicate-heading">Is this the same problem?</SectionHeading>
+      <p className="mt-1 text-[14px] text-brown-600">
+        A report {Math.round(suggestion.distance_m)} m away looks similar
+        {suggestion.label === 'likely_duplicate' ? ' (likely the same)' : ''}. Confirming
+        adds your support to that report instead of opening a second one.
+      </p>
+
+      <div className="mt-3 flex gap-3">
+        {suggestion.candidate_photo_url ? (
+          <img
+            src={suggestion.candidate_photo_url}
+            alt="The earlier report's photo"
+            className="size-20 shrink-0 border border-sand-300 object-cover"
+          />
+        ) : null}
+        <p className="min-w-0 flex-1 text-[14px] leading-6 text-brown-900">
+          {suggestion.candidate_summary || 'An earlier report at a nearby location.'}
+        </p>
+      </div>
+
+      {suggestion.shared_terms?.length ? (
+        <p className="mt-2 text-[12px] text-brown-600">
+          Shared words: {suggestion.shared_terms.join(', ')}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => onAnswer(true)}
+          disabled={busy}
+          className="h-11 bg-green-700 px-4 text-[14px] font-semibold text-cream-50 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:bg-sand-300 disabled:text-brown-600"
+        >
+          Yes, same problem
+        </button>
+        <button
+          type="button"
+          onClick={() => onAnswer(false)}
+          disabled={busy}
+          className="h-11 border border-brown-600 px-4 text-[14px] font-semibold text-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:text-brown-600"
+        >
+          No, something else
+        </button>
+      </div>
+    </section>
+  )
 }
 
 export function ReportPage({ id }) {
   const [report, setReport] = useState(null)
+  const [nearby, setNearby] = useState([])
   const [status, setStatus] = useState('loading')
+  const [errorMessage, setErrorMessage] = useState('')
   const [announcement, setAnnouncement] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [polls, setPolls] = useState(0)
   const { openAuthModal } = useAuthModal()
   const store = useSyncExternalStore(subscribe, getSnapshot)
 
-  useEffect(() => {
-    let alive = true
-    setStatus('loading')
-    document.title = 'Loading report · Civic Pulse'
-    fetchReport(id).then((result) => {
-      if (!alive) return
-      setReport(result)
-      setStatus(result ? 'ready' : 'missing')
-    })
-    return () => {
-      alive = false
+  // Fetches and replaces the report without touching the loading state, so the
+  // poll below can refresh in place. The first statement is an await, which is
+  // what keeps this callable from a mount effect.
+  const refresh = useCallback(async () => {
+    try {
+      const found = await fetchReport(id)
+      if (!found) {
+        setStatus('missing')
+        return
+      }
+      setReport(found)
+      setStatus('ready')
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : 'The report could not be loaded.',
+      )
+      setStatus('error')
     }
   }, [id])
 
+  const load = useCallback(
+    async ({ silent = false } = {}) => {
+      if (!silent) setStatus('loading')
+      await refresh()
+    },
+    [refresh],
+  )
+
+  // The component is keyed by report id, so state starts clean on every report,
+  // and `status` already begins as 'loading'.
   useEffect(() => {
-    if (status !== 'ready' || !report) return
+    // Every state write in refresh() lands after the await, so this is a fetch on
+    // mount, not a synchronous setState cascade.
+    // eslint-disable-next-line react/set-state-in-effect
+    refresh()
+  }, [refresh])
+
+  useEffect(() => {
+    if (!report) return
     document.title = `${report.title} · Civic Pulse`
-    window.scrollTo(0, 0)
     document.getElementById('report-title')?.focus()
-  }, [status, report])
+  }, [report])
 
   useEffect(() => {
     const previous = document.title
@@ -62,16 +250,104 @@ export function ReportPage({ id }) {
     }
   }, [])
 
+  // A report is unfinished until it has a severity. Poll, then stop.
+  const analysing =
+    Boolean(report) &&
+    !report.severity &&
+    (report.rawStatus === 'received' || report.rawStatus === 'analysed')
+
+  useEffect(() => {
+    if (!analysing || polls >= MAX_POLLS) return undefined
+    const timer = setTimeout(() => {
+      setPolls((count) => count + 1)
+      load({ silent: true })
+    }, POLL_MS)
+    return () => clearTimeout(timer)
+  }, [analysing, report, polls, load])
+
+  const nearbyId = report?.id
+  const nearbyLocality = report?.locality
+
+  useEffect(() => {
+    if (!nearbyId || !nearbyLocality) return undefined
+    let alive = true
+    fetchNearbyReports({ id: nearbyId, locality: nearbyLocality })
+      .then((items) => {
+        if (alive) setNearby(items)
+      })
+      .catch(() => {
+        if (alive) setNearby([])
+      })
+    return () => {
+      alive = false
+    }
+  }, [nearbyId, nearbyLocality])
+
   if (status === 'loading') return <ReportSkeleton />
   if (status === 'missing' || !report) return <ReportNotFound />
 
+  if (status === 'error') {
+    return (
+      <main className="mx-auto w-full max-w-[1120px] px-4 py-16 lg:px-0">
+        <h1 className="font-display text-[28px] leading-tight text-brown-900 lg:text-[36px]">
+          That report could not be loaded.
+        </h1>
+        <p className="mt-2 max-w-[65ch] text-[15px] text-brown-600">{errorMessage}</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => load()}
+            className="h-11 border border-brown-600 px-4 text-[14px] font-semibold text-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
+          >
+            Try again
+          </button>
+          <a
+            href="#/issues"
+            className="inline-flex h-11 items-center px-4 text-[14px] font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4"
+          >
+            {labels.backToReports}
+          </a>
+        </div>
+      </main>
+    )
+  }
+
   const supported = Boolean(store.supported[report.id])
-  const count = report.supporters + (supported ? 1 : 0)
-  const showTracker = report.officialStatus !== 'reported' || (report.updates || []).length > 0
+  const count = supportCount(report.id, report.supporters)
+  const showTracker = report.officialStatus !== 'reported' || report.updates.length > 0
 
   const onSupport = () => {
-    const nowSupported = toggleSupport(report.id)
+    const nowSupported = toggleSupport(report.id, report.supporters)
     setAnnouncement(nowSupported ? 'You support this report' : 'Support removed')
+  }
+
+  const onAnswerDuplicate = async (sameProblem) => {
+    setBusy(true)
+    try {
+      await answerDuplicate(report.id, sameProblem)
+      setAnnouncement(
+        sameProblem ? 'Merged into the earlier report' : 'Recorded as a separate problem',
+      )
+      await load({ silent: true })
+    } catch (error) {
+      setAnnouncement(error instanceof Error ? error.message : 'That answer could not be saved.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const onReanalyse = async () => {
+    setBusy(true)
+    try {
+      await reanalyse(report.id)
+      setPolls(0)
+      setAnnouncement('Analysis queued')
+      await load({ silent: true })
+    } catch (error) {
+      setAnnouncement(error instanceof Error ? error.message : 'That request failed.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   const goBack = () => {
@@ -82,6 +358,8 @@ export function ReportPage({ id }) {
     }
     window.location.hash = '#/issues'
   }
+
+  const mapHref = `https://www.openstreetmap.org/?mlat=${report.lat}&mlon=${report.lng}#map=18/${report.lat}/${report.lng}`
 
   return (
     <>
@@ -108,6 +386,45 @@ export function ReportPage({ id }) {
           <article aria-labelledby="report-title" className="pt-2">
             <ReportHeader report={report} />
 
+            {report.status === 'merged' ? (
+              <p className="mt-3 border-l-4 border-brown-900 pl-3 text-[14px] text-brown-900">
+                Merged into an earlier report
+                {report.mergedInto ? (
+                  <>
+                    {' '}
+                    (
+                    <a
+                      href={`#/issues/${report.mergedInto}`}
+                      className="font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4"
+                    >
+                      {report.mergedInto.slice(0, 8)}
+                    </a>
+                    )
+                  </>
+                ) : null}
+                .
+              </p>
+            ) : null}
+
+            {report.status === 'needs_better_photo' ? (
+              <p className="mt-3 border-l-4 border-coral-700 pl-3 text-[14px] text-brown-900">
+                The photo could not be read as a civic issue.{' '}
+                <a
+                  href="#/submit"
+                  className="font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4"
+                >
+                  File a new report
+                </a>{' '}
+                with a clearer photo.
+              </p>
+            ) : null}
+
+            {report.status === 'needs_review' ? (
+              <p className="mt-3 border-l-4 border-coral-700 pl-3 text-[14px] text-brown-900">
+                Analysis could not be completed. The report is kept; you can try again below.
+              </p>
+            ) : null}
+
             <div className="mt-4">
               {showTracker ? (
                 <div className="lg:hidden">
@@ -127,6 +444,12 @@ export function ReportPage({ id }) {
               )}
             </div>
 
+            {analysing ? (
+              <p aria-live="polite" className="mt-3 text-[13px] text-brown-600">
+                {polls >= MAX_POLLS ? labels.analysisStalled : labels.analysisRunning}
+              </p>
+            ) : null}
+
             {report.photos?.length ? (
               <div className="mt-4">
                 <PhotoGallery photos={report.photos} title={report.title} />
@@ -135,16 +458,27 @@ export function ReportPage({ id }) {
 
             <div className="mt-4 flex flex-col gap-4">
               <ReportDescription description={report.description} />
-              <LocationBlock addressBlock={report.addressBlock} />
+              <LocationBlock
+                addressBlock={report.addressBlock}
+                mapHref={mapHref}
+                coords={`${report.lat.toFixed(5)}, ${report.lng.toFixed(5)}`}
+              />
             </div>
+
+            <SeveritySection report={report} onReanalyse={onReanalyse} busy={busy} />
 
             <div className="mt-6 flex flex-col gap-4">
               {report.updates?.length ? (
-                <OfficialUpdates updates={report.updates} />
+                <OfficialUpdates
+                  updates={report.updates}
+                  note="Recorded automatically from the report's own status history. Not a message from a government department."
+                />
               ) : (
                 <NoResponseNote ageDays={report.ageDays} />
               )}
             </div>
+
+            <DuplicatePrompt report={report} onAnswer={onAnswerDuplicate} busy={busy} />
 
             <div className="mt-6">
               <CommentsSection
@@ -155,7 +489,7 @@ export function ReportPage({ id }) {
             </div>
 
             <div className="mt-6">
-              <NearbyReports reports={nearbyFor(report)} />
+              <NearbyReports reports={nearby} />
             </div>
           </article>
 
@@ -163,7 +497,7 @@ export function ReportPage({ id }) {
             aria-label="Report summary"
             className="hidden lg:sticky lg:top-20 lg:block lg:self-start"
           >
-            <SupportBox report={report} supported={supported} onSupport={onSupport} />
+            <SupportBox report={report} supported={supported} count={count} onSupport={onSupport} />
             {showTracker ? (
               <div className="mt-4">
                 <TrackerVertical
@@ -177,13 +511,13 @@ export function ReportPage({ id }) {
               </div>
             ) : null}
             <div className="mt-4">
-              <LocationBlock addressBlock={report.addressBlock} withMap />
+              <LocationBlock addressBlock={report.addressBlock} withMap mapHref={mapHref} />
             </div>
           </aside>
         </div>
       </main>
 
-      <SupportBar report={report} supported={supported} onSupport={onSupport} />
+      <SupportBar report={report} supported={supported} count={count} onSupport={onSupport} />
     </>
   )
 }

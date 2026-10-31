@@ -27,7 +27,7 @@ export function AuthBrandPanel({ view }) {
       <div className="relative">
         <p className="label-caps hidden items-center gap-2 text-coral-300 md:flex">
           <BroadcastIcon size={16} />
-          On the air — Ward 7
+          On the air — Prayagraj
         </p>
 
         <p className="font-headline text-xl leading-tight font-semibold text-cream-100 md:mt-6 md:text-[28px]">

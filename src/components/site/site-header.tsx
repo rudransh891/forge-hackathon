@@ -5,6 +5,7 @@ import { useAuthModal } from '@/components/auth/AuthModalProvider'
 const LINKS = [
   { href: '#how-it-works', label: 'How it works' },
   { href: '#/issues', label: 'Issues' },
+  { href: '#/submit', label: 'Report' },
   { href: '#polls', label: 'Polls' },
   { href: '#faq', label: 'FAQ' },
   { href: '#about', label: 'About' },

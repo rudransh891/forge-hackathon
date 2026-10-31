@@ -4,6 +4,9 @@ import { labels } from './feedConfig'
 /**
  * One-tap poll. Voting is local state only; results are text plus bars, so the
  * outcome never depends on colour.
+ *
+ * There is no poll table behind this yet, so the card says so instead of
+ * implying a live count.
  */
 export function PollCard({ poll }) {
   const [voted, setVoted] = useState(null)
@@ -17,7 +20,9 @@ export function PollCard({ poll }) {
 
   return (
     <section aria-labelledby={headingId} className="bg-brown-900 p-4">
-      <p className="text-[12px] text-on-panel-muted">Poll · closes {poll.closes}</p>
+      <p className="text-[12px] text-on-panel-muted">
+        Poll · {poll.closes ? `closes ${poll.closes}` : labels.pollNotConnected}
+      </p>
       <h2
         id={headingId}
         className="mt-1 font-display text-[20px] leading-tight text-cream-100"
@@ -42,8 +47,8 @@ export function PollCard({ poll }) {
         <div className="mt-3">
           <ul className="flex list-none flex-col gap-3 p-0">
             {poll.options.map((option, index) => {
-              const percent = Math.round((counts[index] / total) * 100)
-              const isLeader = counts[index] === leader
+              const percent = total > 0 ? Math.round((counts[index] / total) * 100) : 0
+              const isLeader = total > 0 && counts[index] === leader
               return (
                 <li key={option.id}>
                   <div className="flex items-baseline justify-between gap-3 text-[12px] text-cream-100">
@@ -64,7 +69,7 @@ export function PollCard({ poll }) {
             })}
           </ul>
           <p className="mt-3 text-[12px] text-on-panel-muted">
-            {labels.pollCloses} {poll.closes}. {total.toLocaleString('en-US')} votes so far.
+            Kept in this browser only. {labels.pollNotConnected.toLowerCase()}.
           </p>
         </div>
       )}
