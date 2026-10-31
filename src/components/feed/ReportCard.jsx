@@ -1,3 +1,4 @@
+import { feedNavigation } from '@/components/report/feedNavigation'
 import { CommentIcon } from './icons'
 import { ReportPhoto } from './ReportPhoto'
 import { StatusTag, UpdateNote, VerificationMark } from './StatusTag'
@@ -38,7 +39,17 @@ export function ReportCard({ report, supported, onSupport }) {
             id={headlineId}
             className="mt-1.5 font-display text-[17px] leading-[1.25] text-brown-900 md:text-[20px]"
           >
-            {report.title}
+            <a
+              href={`#/issues/${report.id}`}
+              onClick={() => {
+                feedNavigation.cameFromFeed = true
+            feedNavigation.scrollY = window.scrollY
+                feedNavigation.scrollY = window.scrollY
+              }}
+              className="hover:underline hover:decoration-coral-500 hover:decoration-2 hover:underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
+            >
+              {report.title}
+            </a>
           </h2>
 
           <UpdateNote update={report.update} />

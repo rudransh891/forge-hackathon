@@ -11,11 +11,13 @@ import { SiteFooter } from '@/components/site/site-footer'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { AuthModalProvider } from '@/components/auth/AuthModalProvider'
 import { FeedPage } from '@/components/feed/FeedPage'
+import { ReportPage } from '@/components/report/ReportPage'
+import { feedNavigation } from '@/components/report/feedNavigation'
 
 /**
  * No router in this project: the feed is mounted from the URL hash so the
  * landing page stays a single static page and nothing new is installed.
- * "#/issues" -> feed, anything else -> landing.
+ * "#/issues" -> feed, "#/issues/{id}" -> report, anything else -> landing.
  */
 function App() {
   const [hash, setHash] = useState(() => window.location.hash)
@@ -23,12 +25,19 @@ function App() {
   useEffect(() => {
     const onHashChange = () => {
       setHash(window.location.hash)
-      window.scrollTo(0, 0)
+      // The report page scrolls itself to the top once it has content; leaving
+      // the feed's scroll intact until then is what lets it be remembered.
+      if (!feedNavigation.restoringFeed && !feedNavigation.cameFromFeed) {
+        window.scrollTo(0, 0)
+      }
+      feedNavigation.restoringFeed = false
     }
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
+  const reportMatch = hash.match(/^#\/issues\/([^/]+)$/)
+  const reportId = reportMatch ? reportMatch[1] : null
   const showFeed = hash === '#/issues'
 
   return (
@@ -48,7 +57,9 @@ function App() {
 
       <SiteHeader />
 
-      {showFeed ? (
+      {reportId ? (
+        <ReportPage key={reportId} id={reportId} />
+      ) : showFeed ? (
         <FeedPage />
       ) : (
         <main id="top">

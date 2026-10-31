@@ -36,12 +36,30 @@ export const labels = {
   unverified: 'Unverified',
   reportIssue: 'Report an issue',
   pollCloses: 'Poll closes',
+  backToReports: 'Reports',
+  noResponse: 'No response from the city yet.',
+  notVerified: 'Not yet verified by the ward office.',
+  waitingForCity: 'Waiting for the city to respond.',
+  logInToComment: 'Log in to comment.',
+  emptyComments: 'Be the first to comment.',
 }
 
 /** Reports with no photo and fewer supporters than this collapse to a brief. */
 export const briefThreshold = 30
 
 export const pageSize = 8
+
+/* Report detail page */
+export const unverifiedNoteAfterDays = 14
+export const noResponseNoteAfterDays = 3
+export const detailCommentsPageSize = 10
+
+export const trackerSteps = [
+  { id: 'reported', label: 'Reported' },
+  { id: 'seen', label: 'Seen by city' },
+  { id: 'scheduled', label: 'Scheduled' },
+  { id: 'fixed', label: 'Fixed' },
+]
 
 export function categoryLabel(category) {
   return category === 'All' ? 'every category' : category

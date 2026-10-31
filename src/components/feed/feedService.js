@@ -1,4 +1,4 @@
-import { notices, poll, reports } from './feedData'
+import { commentsByReport, notices, poll, reports } from './feedData'
 import { pageSize as defaultPageSize } from './feedConfig'
 
 const DELAY = 400
@@ -65,4 +65,61 @@ export async function fetchPoll() {
 export async function votePoll({ pollId, optionId }) {
   await wait(DELAY)
   return { status: 'recorded', pollId, optionId }
+}
+
+/**
+ * @param {string} id
+ * @returns {Promise<object|null>}
+ * TODO: GET /api/reports/:id
+ */
+export async function fetchReport(id) {
+  await wait(350)
+  return reports.find((report) => report.id === id) ?? null
+}
+
+/**
+ * @param {string} id
+ * @param {{ sort?: 'top'|'newest', offset?: number, limit?: number }} query
+ * @returns {Promise<{ items: object[], total: number }>}
+ * TODO: GET /api/reports/:id/comments?sort=&offset=&limit=
+ */
+export async function fetchComments(id, { sort = 'top', offset = 0, limit = 10 } = {}) {
+  await wait(DELAY)
+  const all = [...(commentsByReport[id] || [])]
+  if (sort === 'newest') all.reverse()
+  else all.sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.helpful - a.helpful)
+  return { items: all.slice(offset, offset + limit), total: all.length }
+}
+
+/**
+ * @param {{ reportId: string, text: string }} payload
+ * @returns {Promise<{ status: 'not_configured' }>}
+ * TODO: POST /api/reports/:id/comments
+ */
+export async function postComment(payload) {
+  void payload
+  await wait(DELAY)
+  return { status: 'not_configured' }
+}
+
+/**
+ * @param {{ commentId: string, reason: string }} payload
+ * @returns {Promise<{ status: 'not_configured' }>}
+ * TODO: POST /api/comments/:id/flags
+ */
+export async function flagComment(payload) {
+  void payload
+  await wait(DELAY)
+  return { status: 'not_configured' }
+}
+
+/**
+ * @param {{ commentId: string, helpful: boolean }} payload
+ * @returns {Promise<{ status: 'not_configured' }>}
+ * TODO: POST /api/comments/:id/helpful
+ */
+export async function voteHelpful(payload) {
+  void payload
+  await wait(DELAY)
+  return { status: 'not_configured' }
 }

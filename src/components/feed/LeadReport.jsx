@@ -1,3 +1,4 @@
+import { feedNavigation } from '@/components/report/feedNavigation'
 import { CommentIcon } from './icons'
 import { ReportPhoto } from './ReportPhoto'
 import { StatusTag, VerificationMark } from './StatusTag'
@@ -48,7 +49,16 @@ export function LeadReport({ report, supported, onSupport }) {
             id={headlineId}
             className="mt-2 font-display text-[21px] leading-[1.15] text-cream-100 md:text-[28px]"
           >
-            {report.title}
+            <a
+              href={`#/issues/${report.id}`}
+              onClick={() => {
+                feedNavigation.cameFromFeed = true
+                feedNavigation.scrollY = window.scrollY
+              }}
+              className="hover:underline hover:decoration-coral-300 hover:decoration-2 hover:underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
+            >
+              {report.title}
+            </a>
           </h2>
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 lg:mt-auto">

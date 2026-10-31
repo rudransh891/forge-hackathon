@@ -67,8 +67,8 @@ export function ReportPhoto({
 
       {open ? (
         <PhotoLightbox
-          src={src}
-          alt={fallbackAlt}
+          photos={[{ src, alt: fallbackAlt }]}
+          startIndex={0}
           onClose={() => {
             setOpen(false)
             triggerRef.current?.focus()
@@ -81,9 +81,15 @@ export function ReportPhoto({
 
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
 
-function PhotoLightbox({ src, alt, onClose }) {
+/**
+ * Shared lightbox. The feed passes a single photo, the report gallery passes
+ * the whole set plus a start index; arrow keys walk the set.
+ */
+export function PhotoLightbox({ photos, startIndex = 0, onClose }) {
   const dialogRef = useRef(null)
   const closeRef = useRef(null)
+  const [index, setIndex] = useState(startIndex)
+  const current = photos[index] || photos[0] || { src: '', alt: '' }
 
   useEffect(() => {
     const { body } = document
@@ -98,6 +104,14 @@ function PhotoLightbox({ src, alt, onClose }) {
       if (event.key === 'Escape') {
         event.stopPropagation()
         onClose()
+        return
+      }
+      if (photos.length > 1 && event.key === 'ArrowRight') {
+        setIndex((value) => (value + 1) % photos.length)
+        return
+      }
+      if (photos.length > 1 && event.key === 'ArrowLeft') {
+        setIndex((value) => (value - 1 + photos.length) % photos.length)
         return
       }
       if (event.key !== 'Tab' || !dialogRef.current) return
@@ -120,7 +134,7 @@ function PhotoLightbox({ src, alt, onClose }) {
       body.style.paddingRight = previousPadding
       document.removeEventListener('keydown', onKeyDown, true)
     }
-  }, [onClose])
+  }, [onClose, photos.length])
 
   return createPortal(
     <div
@@ -133,7 +147,7 @@ function PhotoLightbox({ src, alt, onClose }) {
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label={alt}
+        aria-label={current.alt}
         className="relative max-h-[90dvh] w-full max-w-[900px] bg-brown-900 p-2"
       >
         <button
@@ -146,10 +160,15 @@ function PhotoLightbox({ src, alt, onClose }) {
           <CloseIcon size={20} />
         </button>
         <img
-          src={src}
-          alt={alt}
+          src={current.src}
+          alt={current.alt}
           className="mx-auto max-h-[80dvh] w-auto max-w-full object-contain"
         />
+        {photos.length > 1 ? (
+          <p className="pt-2 text-center text-[12px] text-cream-100">
+            {index + 1} / {photos.length}
+          </p>
+        ) : null}
       </div>
     </div>,
     document.body,

@@ -12,6 +12,7 @@ import { AlertIcon } from './icons'
 import { briefThreshold, labels } from './feedConfig'
 import { fetchNotices, fetchPoll } from './feedService'
 import { useFeed } from './useFeed'
+import { feedNavigation } from '@/components/report/feedNavigation'
 
 export function FeedPage() {
   const feed = useFeed()
@@ -44,6 +45,14 @@ export function FeedPage() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     listTop.current?.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' })
   }, [feed.category, feed.sort])
+
+  // Returning from a report: put the feed back where it was.
+  useEffect(() => {
+    if (!feedNavigation.cameFromFeed) return
+    feedNavigation.cameFromFeed = false
+    const y = feedNavigation.scrollY
+    requestAnimationFrame(() => window.scrollTo(0, y))
+  }, [])
 
   // Paging: IntersectionObserver only, never a scroll listener.
   useEffect(() => {

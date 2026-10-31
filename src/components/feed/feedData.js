@@ -1,3 +1,5 @@
+import potholePhoto from '../../assets/feed/pothole.svg'
+import crackPhoto from '../../assets/feed/crack.svg'
 import roadPhoto from '../../assets/feed/road.svg'
 import parkPhoto from '../../assets/feed/park.svg'
 import busPhoto from '../../assets/feed/bus.svg'
@@ -6,7 +8,7 @@ import binPhoto from '../../assets/feed/bin.svg'
 import crosswalkPhoto from '../../assets/feed/crosswalk.svg'
 
 /** Mock content. Replace with feedService fetches when an API exists. */
-export const reports = [
+const RAW_REPORTS = [
   {
     id: 'r-01',
     category: 'Roads',
@@ -72,7 +74,7 @@ export const reports = [
     category: 'Water',
     locality: 'Riverside',
     title: 'Standing water after every storm on Kestrel',
-    ageDays: 9,
+    ageDays: 16,
     verification: 'unverified',
     urgent: false,
     status: 'open',
@@ -355,6 +357,138 @@ export const reports = [
     supportedByMe: false,
   },
 ]
+
+/* ------------------------------------------------------------------
+   Detail fields. Every report gets the full shape so the detail page never
+   has to guess; a few carry hand-written content.
+------------------------------------------------------------------- */
+
+
+const DETAILS = {
+  'r-01': {
+    description:
+      'Six craters along a two-block stretch, two of them deep enough to damage a wheel. The resurfacing closed the worst of them in September, but the January frosts opened them again. Reported eleven days ago, seen by a city inspector on 2 November.',
+    addressBlock: 'Elm Street, 4th to 6th',
+    photos: [
+      { src: roadPhoto, alt: 'Deep pothole in the middle of the Elm Street lane' },
+      { src: potholePhoto, alt: 'Close view of the crater edge and loose asphalt' },
+      { src: crackPhoto, alt: 'Cracked road surface beside the repaired section' },
+    ],
+    officialStatus: 'seen',
+    statusDates: { seen: '2 Nov' },
+    updates: [
+      {
+        id: 'u-01-1',
+        author: 'Public Works',
+        dateLabel: '4 Nov',
+        text: 'Repair scheduled for the week of 10 Nov.',
+        verified: true,
+      },
+    ],
+    commentCount: 31,
+  },
+  'r-02': {
+    description:
+      'The temporary cut removes the only east-west service after 7 PM. Riders on the east side are walking to Halden Road to catch anything at all.',
+    addressBlock: 'Halden Road, east side',
+    photos: [{ src: busPhoto, alt: 'A route 12 bus at the stop on Halden Road' }],
+    officialStatus: 'seen',
+    statusDates: { seen: '3 Nov' },
+    updates: [],
+    commentCount: 12,
+  },
+  'r-05': {
+    description:
+      'Water collects across the full width of the road after every heavy shower and takes two days to drain. The gully outside number 14 is silted up.',
+    addressBlock: 'Kestrel Rise, lower end',
+    photos: [],
+    officialStatus: 'reported',
+    updates: [],
+    commentCount: 0,
+  },
+  'r-06': {
+    description:
+      'The lamp beside the play area has been dead since the clocks changed. The east half of the playground is unlit before six.',
+    addressBlock: 'Maple Grove park, east side',
+    photos: [{ src: lightPhoto, alt: 'The new lamp head on Maple Grove' }],
+    officialStatus: 'fixed',
+    statusDates: { seen: '1 Nov', scheduled: '2 Nov', fixed: '3 Nov' },
+    updates: [
+      {
+        id: 'u-06-1',
+        author: 'Parks team',
+        dateLabel: '3 Nov',
+        text: 'Fixture replaced and tested. The timer now runs until 8 PM.',
+        verified: true,
+      },
+    ],
+    commentCount: 9,
+  },
+  'r-07': {
+    description:
+      'Bins were left unemptied for the whole bank holiday weekend and the smell carried into the courtyard.',
+    addressBlock: 'Foster Court, rear service yard',
+    photos: [{ src: binPhoto, alt: 'Bins stacked against the wall behind Foster Court' }],
+    officialStatus: 'fixed',
+    statusDates: { seen: '5 Nov', fixed: '7 Nov' },
+    updates: [],
+    commentCount: 7,
+  },
+}
+
+const defaultDetail = (report) => ({
+  description: `${report.category} issue reported in ${report.locality}. Raised by a resident so the ward office and neighbors can see it.`,
+  addressBlock: `${report.locality}, block level only`,
+  photos: [],
+  officialStatus: report.status === 'resolved' ? 'fixed' : 'reported',
+  statusDates: {},
+  updates: [],
+  commentCount: report.comments,
+})
+
+export const reports = RAW_REPORTS.map((report) => ({
+  ...defaultDetail(report),
+  ...report,
+  ...(DETAILS[report.id] || {}),
+}))
+
+/* ------------------------------------------------------------------
+   Comments. Deterministic mock content so the page has something to show.
+------------------------------------------------------------------- */
+
+const COMMENT_TEXTS = [
+  'Hit one on Tuesday, cost me a tire.',
+  'Same stretch, third time this year. Photos are from this morning.',
+  'Reported this in September and it was patched in a week.',
+  'The temporary repair is already breaking up again.',
+  'Bus route 12 is the bigger problem for us on this side.',
+  'Water sits in the dip by the junction after every rain.',
+  'Any update from the ward office on a date?',
+  'My wheel bearing went last month because of this.',
+  'Glad someone finally put it in writing.',
+  'Shared with the school run group so people slow down.',
+]
+
+const LOCALITIES = ['Elm Park', 'Maple Grove', 'East Side', 'Downtown', 'Riverside', 'Northgate']
+
+function buildComments(reportId, count) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `${reportId}-c${index + 1}`,
+    locality: LOCALITIES[index % LOCALITIES.length],
+    ageLabel: `${(index % 9) + 1}d`,
+    text: COMMENT_TEXTS[index % COMMENT_TEXTS.length],
+    helpful: Math.max(0, 24 - index * 2),
+    pinned: index === 0,
+    helpfulByMe: false,
+  }))
+}
+
+export const commentsByReport = {
+  'r-01': buildComments('r-01', 31),
+  'r-02': buildComments('r-02', 12),
+  'r-05': [],
+}
+
 
 export const notices = [
   { id: 'n-1', label: 'Ward meeting Thursday 7 PM at the library', href: '#' },

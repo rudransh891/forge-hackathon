@@ -38,9 +38,13 @@ export function SupportButton({
       ? supported
         ? 'border-cream-100 bg-cream-100 text-brown-900'
         : 'border-coral-300 bg-coral-300 text-brown-900 hover:bg-cream-100'
-      : supported
-        ? 'border-green-700 bg-green-700 text-cream-50'
-        : 'border-green-700 bg-transparent text-green-700 hover:bg-green-100'
+      : tone === 'detail'
+        ? supported
+          ? 'border-2 border-green-700 bg-sand-100 text-green-700'
+          : 'border-green-700 bg-green-700 text-cream-50 hover:bg-brown-900'
+        : supported
+          ? 'border-green-700 bg-green-700 text-cream-50'
+          : 'border-green-700 bg-transparent text-green-700 hover:bg-green-100'
 
   return (
     <button
