@@ -242,6 +242,7 @@ export function SignupForm() {
               key={method.id}
               type="button"
               disabled={!method.enabled}
+              onClick={() => method.onSelect?.()}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-[6px] border border-brown-600 bg-transparent text-sm font-semibold text-brown-900 transition-colors hover:bg-sand-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-100 disabled:text-brown-600"
             >
               {method.label}
