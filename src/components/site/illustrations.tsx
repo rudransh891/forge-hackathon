@@ -82,9 +82,9 @@ export function RoadArt({ className }: ArtProps) {
       </g>
       <ellipse cx="196" cy="228" rx="34" ry="12" fill="var(--color-brown-900)" />
       <path d="M286 196l16 30h-32z" fill="var(--color-coral-500)" />
-      <rect x="281" y="226" width="10" height="16" rx="3" fill="var(--color-coral-700)" />
-      <rect x="58" y="96" width="70" height="46" rx="6" fill="var(--color-cream-50)" />
-      <rect x="272" y="84" width="86" height="58" rx="6" fill="var(--color-cream-50)" />
+      <rect x="281" y="226" width="10" height="16" fill="var(--color-coral-700)" />
+      <rect x="58" y="96" width="70" height="46" fill="var(--color-cream-50)" />
+      <rect x="272" y="84" width="86" height="58" fill="var(--color-cream-50)" />
     </svg>
   )
 }
@@ -95,13 +95,13 @@ export function ParkArt({ className }: ArtProps) {
       <rect width="400" height="300" fill="var(--color-teal-100)" />
       <ellipse cx="200" cy="252" rx="190" ry="42" fill="var(--color-green-100)" />
       <g>
-        <rect x="86" y="196" width="10" height="62" rx="4" fill="var(--color-brown-600)" />
+        <rect x="86" y="196" width="10" height="62" fill="var(--color-brown-600)" />
         <circle cx="91" cy="170" r="42" fill="var(--color-green-700)" />
-        <rect x="286" y="206" width="9" height="52" rx="4" fill="var(--color-brown-600)" />
+        <rect x="286" y="206" width="9" height="52" fill="var(--color-brown-600)" />
         <circle cx="290" cy="184" r="32" fill="var(--color-green-700)" />
       </g>
       <g>
-        <rect x="196" y="150" width="7" height="112" rx="3" fill="var(--color-brown-900)" />
+        <rect x="196" y="150" width="7" height="112" fill="var(--color-brown-900)" />
         <circle cx="199" cy="146" r="18" fill="var(--color-amber-500)" />
         <path d="M199 128a18 18 0 0 1 18 18" stroke="var(--color-brown-900)" strokeWidth="4" fill="none" />
         <ellipse cx="199" cy="272" rx="46" ry="9" fill="var(--color-amber-500)" opacity="0.35" />
@@ -115,10 +115,10 @@ export function BusArt({ className }: ArtProps) {
     <svg viewBox="0 0 400 300" aria-hidden className={className}>
       <rect width="400" height="300" fill="var(--color-cream-300)" />
       <path d="M0 236h400v64H0z" fill="var(--color-brown-600)" opacity="0.35" />
-      <rect x="58" y="96" width="284" height="118" rx="16" fill="var(--color-green-700)" />
-      <rect x="80" y="116" width="72" height="42" rx="6" fill="var(--color-cream-50)" />
-      <rect x="164" y="116" width="72" height="42" rx="6" fill="var(--color-cream-50)" />
-      <rect x="248" y="116" width="72" height="42" rx="6" fill="var(--color-cream-50)" />
+      <rect x="58" y="96" width="284" height="118" fill="var(--color-green-700)" />
+      <rect x="80" y="116" width="72" height="42" fill="var(--color-cream-50)" />
+      <rect x="164" y="116" width="72" height="42" fill="var(--color-cream-50)" />
+      <rect x="248" y="116" width="72" height="42" fill="var(--color-cream-50)" />
       <rect x="58" y="176" width="284" height="8" fill="var(--color-teal-400)" />
       <circle cx="118" cy="222" r="22" fill="var(--color-brown-900)" />
       <circle cx="118" cy="222" r="9" fill="var(--color-cream-300)" />

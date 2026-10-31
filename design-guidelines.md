@@ -135,12 +135,17 @@ Desktop: scale Display to 72/76 and H1 to 44/50; everything else stays the same.
 | Token | Value |
 |-------|-------|
 | `--space-1` to `--space-8` | 4, 8, 12, 16, 24, 32, 48, 64 px |
-| `--radius-sm` | 6 px (inputs, tags) |
-| `--radius-md` | 12 px (cards, buttons) |
-| `--radius-pill` | 999 px (chips, ticker items) |
+| `--radius-sm` | 0 px (inputs, tags) |
+| `--radius-md` | 0 px (cards, buttons) |
+| `--radius-pill` | 0 px (chips, ticker items) |
 | `--border-hairline` | 1px solid `--border-subtle` |
 | `--shadow-card` | `0 1px 2px rgba(62, 36, 25, 0.12)` (the only shadow; keep it flat) |
 
+- **Every corner is square.** Radii are 0 across the system: this is letterpress and
+  newsprint, not a rounded web app. Chips, badges and ticker items that would normally be
+  pills are cut as rectangles.
+- **Circles stay circles.** The only round things in the product are shapes that are round
+  by nature: the wordmark dot, radio controls, avatars, and icons. Never a rounded border.
 - Prefer **hairline borders over shadows** for an editorial, old-money feel.
 - Page padding: 20 px mobile, 64 px desktop. Max content width: 1120 px.
 
@@ -157,14 +162,14 @@ Desktop: scale Display to 72/76 and H1 to 44/50; everything else stays the same.
 | Urgent | coral-700 | cream-50 | Destructive or time-critical only |
 | Ghost | transparent | brown-900, underlined | Low-emphasis links |
 
-- Height 48 px (minimum tap target 44 px), radius md, label in Public Sans 600.
+- Height 48 px (minimum tap target 44 px), square corners, label in Public Sans 600.
 - Focus: 3px outline in teal-400 with a 2px offset, always visible.
 - Disabled: 40% opacity plus a `not-allowed` cursor, with text still readable.
 
 ### 5.2 Cards
 
 **Issue card**
-- Background card, hairline border, radius md, padding 16.
+- Background card, hairline border, square corners, padding 16.
 - Top row: status badge (left), locality tag (right).
 - Title: H3. Metadata: Small, secondary text.
 - Footer: supporter count (mono), "Follow" ghost button.
@@ -188,7 +193,7 @@ Desktop: scale Display to 72/76 and H1 to 44/50; everything else stays the same.
 | Closing soon | amber-500 | brown-900 |
 | Urgent | coral-700 | cream-50 |
 
-Labels style, pill radius, always include an icon or text, never color only.
+Labels style, square tag (radius 0), always include an icon or text, never color only.
 
 ### 5.4 Live ticker (reuse of the marquee strip)
 
@@ -206,7 +211,7 @@ Labels style, pill radius, always include an icon or text, never color only.
 ### 5.6 Forms (report an issue, profile)
 
 - Labels above fields, 14 px semibold. Never use placeholder-only labels.
-- Inputs: 48 px high, cream-50 fill, 1px brown-600 border, radius sm.
+- Inputs: 48 px high, cream-50 fill, 1px brown-600 border, square corners.
 - Focus: 2px green-700 border plus the teal focus ring.
 - Error: coral-700 border, an icon, and a message in coral-700 below the field ("Please add a location").
 - Helper text in secondary color. Required fields marked "(required)" in text.
@@ -229,14 +234,14 @@ Labels style, pill radius, always include an icon or text, never color only.
 
 ### 6.1 Illustration style (flat, editable)
 
-- Built only from basic shapes (rectangles, circles, rounded rectangles, simple paths).
+- Built only from basic shapes (rectangles, circles, squares, simple paths). No rounded rectangles.
 - **Palette limited to the tokens in Section 2**; use no gradients, no outlines thicker than 2 px, and no shadows.
 - Recommended file format: SVG, with colors set through `fill="currentColor"` or CSS variables (`fill: var(--color-teal-400)`), so recoloring never means editing the artwork.
 - Layer naming convention: `bg`, `body`, `accent`, `detail` (makes editing predictable).
 - Core illustration set:
   - **Radio** (the mascot; used on hero and panels)
   - Ballot box, megaphone, town hall building, map pin, clipboard (report), speech bubble (feedback)
-- Keep the same proportions across the set: simple, front-facing, slightly rounded corners, 2 to 3 colors per illustration plus cream.
+- Keep the same proportions across the set: simple, front-facing, square corners, 2 to 3 colors per illustration plus cream.
 
 ### 6.2 Icons
 
@@ -252,7 +257,7 @@ Labels style, pill radius, always include an icon or text, never color only.
 ### 7.1 Principles
 
 1. **Separate the layers.** Flat illustrations appear only where there is no user content (hero, empty states, onboarding, section headers). Never overlay illustration on a post photo.
-2. **Consistent frame.** Every photo uses the same ratio, radius and hairline border so varied uploads look like one family.
+2. **Consistent frame.** Every photo uses the same ratio and hairline border so varied uploads look like one family.
 3. **Text stays off photos** where possible. Titles and metadata sit below the image on the cream card.
 4. **Don't recolor citizen photos.** No sepia, duotone or filters on uploads; they can serve as evidence (potholes, flooding, notices). A light warm tone is allowed only on editorial images the team controls (hero, news banners).
 5. **Status lives outside the image.** Badges, the coral urgent edge and the follow button sit on the card, not on the photo.
@@ -267,14 +272,14 @@ Labels style, pill radius, always include an icon or text, never color only.
 | Featured story / hero | 16:9 | Editorial images only |
 | Post detail (gallery) | Original, max height 70vh | Tap to expand, pinch to zoom |
 | Avatar | 1:1 | Circle, 40 px (list) or 72 px (profile) |
-| Thumbnail strip | 1:1 | 64 px, radius sm |
+| Thumbnail strip | 1:1 | 64 px, square corners |
 
 - Upload limits: accept JPEG, PNG, WebP; resize to 1600 px on the long edge; serve responsive sizes and lazy-load below the fold.
 - Always store and show the original orientation correctly (apply EXIF rotation).
 
 ### 7.3 Frame, overlay and placeholder rules
 
-- **Frame:** `--radius-md` corners (top corners only when the image is the top of a card), `--border-hairline` around the image.
+- **Frame:** square corners (no radius), `--border-hairline` around the image.
 - **Multiple photos:** 1 = full width, 2 = side by side, 3+ = one large plus a "+N" tile in brown-900 with cream text.
 - **Text over photo (only if unavoidable):** place on a solid brown-900 band at 90% opacity, or a bottom gradient scrim from `rgba(62, 36, 25, 0.85)` to transparent, with cream text. Never place text directly on an uncontrolled photo.
 - **Loading:** cream-300 block at the correct ratio (prevents layout shift), with no shimmer.
@@ -355,10 +360,10 @@ Labels style, pill radius, always include an icon or text, never color only.
   --border-subtle: var(--color-cream-300);
   --focus-ring: var(--color-teal-400);
 
-  /* Shape and spacing */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-pill: 999px;
+  /* Shape and spacing — square corners everywhere */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-pill: 0px;
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
   --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
   --shadow-card: 0 1px 2px rgba(62, 36, 25, 0.12);
