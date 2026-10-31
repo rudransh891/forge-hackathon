@@ -169,6 +169,9 @@
   body {
     @apply bg-page text-ink;
     font-family: var(--font-ui);
+    /* Native control accents (select highlight in the OS list, checkbox fills)
+       take the coral brand colour instead of the platform blue. */
+    accent-color: var(--color-coral-500);
   }
   h1,
   h2,
@@ -179,8 +182,7 @@
     letter-spacing: -0.01em;
   }
   :focus-visible {
-    outline: 3px solid var(--focus-ring);
-    outline-offset: 2px;
+    outline: 3px solid var(--focus-ring);    outline-offset: 2px;
   }
   ::selection {
     background: var(--color-coral-300);
