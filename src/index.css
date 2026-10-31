@@ -31,13 +31,14 @@
   --font-ui: "Public Sans Variable", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 12px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-3xl: 20px;
-  --radius-4xl: 999px;
+  /* Square corners throughout: letterpress, not rounded web app. */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
 }
 
 :root {
@@ -58,7 +59,7 @@
   --focus-ring: var(--color-teal-400);
 
   /* Shape and space */
-  --radius-pill: 999px;
+  --radius-pill: 0px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;

@@ -37,7 +37,7 @@ The CLI is v4: it takes `-b radix|base|aria` and `-p nova|vega|maia|...`, not th
 | Section | File |
 | --- | --- |
 | Header / nav | `site-header.tsx` |
-| Hero + location lookup + hotspot map | `hero.tsx` |
+| Hero + location lookup + radio mascot | `hero.tsx` |
 | Live pulse stats strip | `pulse-strip.tsx` |
 | Trending issues | `trending-issues.tsx` |
 | How it works | `how-it-works.tsx` |

@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { ArrowRight, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
-import { MapIllustration } from '@/components/site/illustrations'
+import { RadioIllustration } from '@/components/site/illustrations'
 
 export function Hero() {
   const scope = useRef<HTMLDivElement>(null)
@@ -93,8 +93,9 @@ export function Hero() {
           </a>
         </div>
 
-        <div data-reveal>
-          <MapIllustration />
+        <div data-reveal className="flex flex-col items-center gap-6">
+          <RadioIllustration />
+          <p className="label-caps text-ink-muted">Ward 7 · on the air</p>
         </div>
       </Container>
     </section>

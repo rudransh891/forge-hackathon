@@ -3,79 +3,70 @@
  * src/index.css, so recolouring never means editing the artwork.
  */
 
-export function MapIllustration() {
+export function RadioIllustration() {
   return (
-    <figure className="m-0">
-      <svg
-        viewBox="0 0 520 400"
-        role="img"
-        aria-label="Map of Ward 7 with three issue hotspots: two open, one urgent"
-        className="h-auto w-full rounded-xl border border-hairline bg-cream-100"
+    <svg
+      viewBox="0 0 420 330"
+      aria-hidden
+      className="h-auto w-full max-w-[320px] md:max-w-[460px]"
+    >
+      {/* antenna */}
+      <path
+        d="M330 76 372 30"
+        stroke="var(--color-brown-600)"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <circle cx="375" cy="27" r="6" fill="var(--color-brown-600)" />
+
+      {/* cabinet */}
+      <rect x="30" y="76" width="360" height="204" fill="var(--color-brown-900)" />
+      <rect x="30" y="76" width="360" height="16" fill="var(--color-brown-600)" />
+
+      {/* face */}
+      <rect x="46" y="106" width="328" height="160" fill="var(--color-cream-300)" />
+
+      {/* speaker grille */}
+      <rect x="60" y="120" width="176" height="132" fill="var(--color-brown-600)" />
+      <g stroke="var(--color-cream-300)" strokeWidth="3" opacity="0.5">
+        <path d="M68 130h160M68 142h160M68 154h160M68 166h160M68 178h160M68 190h160M68 202h160M68 214h160M68 226h160M68 238h160" />
+      </g>
+
+      {/* dial */}
+      <rect x="252" y="120" width="106" height="70" fill="var(--color-cream-50)" />
+      <rect
+        x="252"
+        y="120"
+        width="106"
+        height="70"
+        fill="none"
+        stroke="var(--color-brown-900)"
+        strokeWidth="2"
+      />
+      <g stroke="var(--color-brown-600)" strokeWidth="1.5">
+        <path d="M262 160v8M278 156v12M294 152v16M310 150v18M326 152v16M342 156v12M350 160v8" />
+      </g>
+      <g
+        fill="var(--color-brown-600)"
+        fontFamily="IBM Plex Mono, monospace"
+        fontSize="7"
       >
-        <rect width="520" height="400" fill="var(--color-cream-100)" />
+        <text x="258" y="184">530</text>
+        <text x="296" y="184">1000</text>
+        <text x="330" y="184">1600</text>
+      </g>
+      <path d="M312 126v26" stroke="var(--color-coral-500)" strokeWidth="3" />
 
-        {/* City blocks */}
-        <g fill="var(--color-cream-50)" stroke="var(--color-cream-300)">
-          <rect x="24" y="24" width="120" height="94" rx="8" />
-          <rect x="24" y="142" width="120" height="86" rx="8" />
-          <rect x="24" y="252" width="120" height="124" rx="8" />
-          <rect x="168" y="24" width="140" height="94" rx="8" />
-          <rect x="168" y="252" width="140" height="124" rx="8" />
-          <rect x="332" y="24" width="164" height="94" rx="8" />
-          <rect x="332" y="142" width="164" height="86" rx="8" />
-          <rect x="332" y="252" width="164" height="124" rx="8" />
-        </g>
+      {/* knobs */}
+      <circle cx="278" cy="224" r="19" fill="var(--color-brown-900)" />
+      <circle cx="278" cy="224" r="6" fill="var(--color-cream-300)" />
+      <circle cx="334" cy="224" r="19" fill="var(--color-brown-900)" />
+      <circle cx="334" cy="224" r="6" fill="var(--color-cream-300)" />
 
-        {/* Roads */}
-        <g stroke="var(--color-cream-300)" strokeWidth="16" strokeLinecap="round">
-          <path d="M150 0v400" />
-          <path d="M0 124h520" />
-          <path d="M0 238h520" />
-          <path d="M316 0v400" />
-        </g>
-        <g stroke="var(--color-cream-50)" strokeWidth="2" strokeDasharray="10 12">
-          <path d="M150 0v400" />
-          <path d="M316 0v400" />
-        </g>
-
-        {/* Park */}
-        <g>
-          <rect x="168" y="142" width="140" height="86" rx="8" fill="var(--color-green-100)" />
-          <circle cx="206" cy="176" r="13" fill="var(--color-green-700)" />
-          <circle cx="248" cy="196" r="10" fill="var(--color-green-700)" />
-          <circle cx="278" cy="170" r="8" fill="var(--color-green-700)" />
-        </g>
-
-        {/* Hotspots */}
-        <g>
-          <circle cx="92" cy="182" r="13" fill="var(--color-teal-400)" opacity="0.5" />
-          <circle cx="92" cy="182" r="7" fill="var(--color-teal-400)" stroke="var(--color-cream-50)" strokeWidth="2" />
-          <circle cx="404" cy="186" r="13" fill="var(--color-teal-400)" opacity="0.5" />
-          <circle cx="404" cy="186" r="7" fill="var(--color-teal-400)" stroke="var(--color-cream-50)" strokeWidth="2" />
-          <circle cx="228" cy="316" r="16" fill="var(--color-coral-500)" opacity="0.4" />
-          <circle cx="228" cy="316" r="8" fill="var(--color-coral-500)" stroke="var(--color-cream-50)" strokeWidth="2" />
-        </g>
-
-        {/* Labels */}
-        <g fill="var(--color-brown-600)" fontFamily="IBM Plex Mono, monospace" fontSize="10" letterSpacing="0.08em">
-          <text x="362" y="112">ELM PARK</text>
-          <text x="38" y="306">MAPLE GROVE</text>
-          <text x="352" y="312">EAST SIDE</text>
-        </g>
-      </svg>
-
-      <figcaption className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-muted">
-        <span className="flex items-center gap-2">
-          <span aria-hidden className="size-2.5 rounded-full bg-teal-400" />
-          Open issue
-        </span>
-        <span className="flex items-center gap-2">
-          <span aria-hidden className="size-2.5 rounded-full bg-coral-500" />
-          Urgent
-        </span>
-        <span className="ml-auto font-mono text-xs">Updated 2 min ago</span>
-      </figcaption>
-    </figure>
+      {/* feet */}
+      <rect x="58" y="280" width="42" height="14" fill="var(--color-brown-600)" />
+      <rect x="320" y="280" width="42" height="14" fill="var(--color-brown-600)" />
+    </svg>
   )
 }
 
