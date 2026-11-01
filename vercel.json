@@ -2,12 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "comment": "Without VITE_API_BASE the app calls /api, which on a static host goes nowhere. This forwards it to the API so the site works whether or not the variable is set.",
       "source": "/api/:path*",
       "destination": "https://fixitbharat-api.onrender.com/:path*"
     },
     {
-      "comment": "Photos are served by the API, so the same applies to them.",
       "source": "/uploads/:path*",
       "destination": "https://fixitbharat-api.onrender.com/uploads/:path*"
     }
