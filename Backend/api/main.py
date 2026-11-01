@@ -18,7 +18,8 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import Response
+from api.images import load_image, mirror_to_disk, restore_to_disk, save_image
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel
 from sqlalchemy import text
@@ -120,7 +121,11 @@ def _store_image(data: bytes) -> str:
     img = ImageOps.exif_transpose(img).convert("RGB")
     img.thumbnail((1280, 1280))
     filename = f"{uuid.uuid4().hex}.jpg"
-    img.save(UPLOAD_DIR / filename, "JPEG", quality=85)
+    buffer = io.BytesIO()
+    img.save(buffer, "JPEG", quality=85)
+    data = buffer.getvalue()
+    save_image(filename, data, "image/jpeg")
+    mirror_to_disk(filename, data)  # cache for the readers that open files
     return filename
 
 
@@ -182,6 +187,9 @@ def _flag(conn, report_id, reason: str) -> None:
 
 @asynccontextmanager
 async def lifespan(app):
+    # On a host without a persistent disk the local cache starts empty, and the
+    # pipeline, the resolution check and the mailer all read files by path.
+    restore_to_disk()
     sched = start_scheduler()
     try:
         yield
@@ -208,7 +216,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+@app.get("/uploads/{name}")
+def serve_upload(name: str):
+    """Photos are rows now, so a host with no disk can still serve them."""
+    if not name or "/" in name or "\\" in name:
+        raise HTTPException(status_code=400, detail="Invalid photo name.")
+    stored = load_image(name)
+    if stored is None:
+        disk = UPLOAD_DIR / name
+        if not disk.exists():
+            raise HTTPException(status_code=404, detail="No such photo.")
+        return Response(content=disk.read_bytes(), media_type="image/jpeg")
+    data, content_type = stored
+    return Response(
+        content=data,
+        media_type=content_type or "image/jpeg",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
 
 app.include_router(geo_router)
 

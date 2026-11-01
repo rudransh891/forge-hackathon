@@ -16,8 +16,8 @@ reads `render.yaml` and asks for the values marked `sync: false`.
 
 If you prefer not to use the blueprint: **New → Web Service**, root directory
 `Backend`, runtime Python 3.13, build `pip install -r requirements.txt`, start
-`uvicorn api.main:app --host 0.0.0.0 --port $PORT`, health check `/health`, then add
-a disk of 1 GB mounted at `/opt/render/project/src/Backend/uploads`.
+`uvicorn api.main:app --host 0.0.0.0 --port $PORT`, health check `/health`.
+The free plan is enough: photo bytes live in Postgres, not on a disk.
 
 ## 2. Fill the environment
 
@@ -83,7 +83,8 @@ bakes this in at build time, so **redeploy the frontend** after setting it.
   `starter` avoids this.
 - **One instance only.** APScheduler runs inside the web process; two instances
   would run two schedulers and two rate-limit counters.
-- **Photos live on the disk**, not object storage. They survive redeploys because of
-  the mount, but not a service deletion. Fine for a demo, not for production.
+- **Photos live in Postgres** (`report_images`). No disk is needed, so the free plan
+  works and restarts lose nothing. The trade-off is database size: every photo is
+  up to ~1.3 MB of `bytea` after downscaling, against 0.5 GB on the Neon free tier.
 - **`ESCALATION_LIVE`** stays unset, so the agent records escalations without
   emailing anyone. Set it to `true` only when you mean it.

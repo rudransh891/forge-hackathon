@@ -3,25 +3,20 @@
 # Region is Ohio (us-east-2) on purpose: the Neon database lives there, and every
 # query currently crosses an ocean from Prayagraj.
 #
-# The disk is mounted *inside* the repo directory because the code resolves photos
-# with a relative path `uploads/` from four modules. Mounting at /var/data would
-# need the code changed; mounting here needs nothing.
+# No disk is needed: photo bytes are stored in Postgres (report_images), so the
+# free plan works and nothing is lost when the instance restarts.
 
 services:
   - type: web
     name: fixitbharat-api
     runtime: python
     region: ohio
-    plan: starter
+    plan: free
     rootDir: Backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     autoDeploy: true
-    disk:
-      name: uploads
-      mountPath: /opt/render/project/src/Backend/uploads
-      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.0

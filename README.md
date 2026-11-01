@@ -223,8 +223,8 @@ which is written in English at generation time.
 
 ## Known limits
 
-- **Photos are on local disk** (`Backend/uploads`). An ephemeral-filesystem deploy
-  loses them, and the pipeline then reports "Photo file missing on server".
+- **Photos are stored in Postgres** (`report_images`), so a host without a disk works
+  and restarts lose nothing. The local `Backend/uploads` directory is only a cache.
 - **Rate limiting and caches are in-process.** Two workers mean two counters.
 - **Complaints go to a test inbox.** No municipal body offers an open submission API;
   the generated complaint says so in its first line.
