@@ -83,12 +83,16 @@ export type FeedItem = {
 export type RawReport = FeedItem & {
   duplicate_of: string | null
   ai_result: Record<string, unknown> | null
+  citizen_category?: string | null
+  resolved_at?: string | null
+  context?: ReportContext | null
 }
 
 export type ReportDetailPayload = {
   report: RawReport
   severity: Severity | null
   timeline: StatusEvent[]
+  photos?: string[]
 }
 
 type FeedPage = {
@@ -103,6 +107,83 @@ export type BackendStats = {
   resolved: number
   routed: number
   in_progress: number
+  overdue: number
+  avg_resolution_hours: number | null
+  by_type: { issue_type: string; count: number }[]
+}
+
+export type ContextPlace = { name: string; type: string; distance_m: number }
+
+export type ReportContext = {
+  fetched_at?: string
+  missing?: string[]
+  geocode?: { ok?: boolean; address?: string; road?: string; locality?: string; city?: string }
+  places?: {
+    ok?: boolean
+    radius_m?: number
+    schools?: ContextPlace[]
+    hospitals?: ContextPlace[]
+    bus_stops?: number
+    note?: string
+    source?: string
+  }
+  road?: {
+    ok?: boolean
+    highway?: string | null
+    name?: string | null
+    ref?: string | null
+    distance_m?: number
+    note?: string
+    source?: string
+  }
+  weather?: {
+    ok?: boolean
+    temperature_c?: number | null
+    rain_last_24h_mm?: number | null
+    source?: string
+  }
+  air_quality?: {
+    ok?: boolean
+    us_aqi?: number | null
+    band?: string | null
+    pm2_5?: number | null
+    source?: string
+  }
+}
+
+/**
+ * Everything the severity score looked at, so the number can be checked.
+ * The backend has stored this since the enrichment phase; nothing rendered it.
+ */
+export type RoutingDelivery = {
+  ok?: boolean
+  error?: string | null
+  target?: string
+  channel?: string
+  attempted_at?: string
+  delivered_at?: string
+  photo_attached?: boolean
+}
+
+export type RoutingRecord = {
+  inside_pilot_area?: boolean
+  body?: string
+  body_confirmed?: boolean
+  complaint_subject?: string | null
+  complaint_text?: string | null
+  delivery?: RoutingDelivery | null
+  citizen_option?: { name?: string; portal?: string; helpline?: string } | null
+  note?: string
+}
+
+export type EscalationAction = {
+  level: number
+  name: string
+  at: string
+  ok: boolean
+  error?: string | null
+  target?: string
+  late_hours?: number
 }
 
 export type UiStatus = 'open' | 'resolved' | 'merged' | 'needs_review' | 'needs_better_photo'
@@ -148,6 +229,24 @@ export type Report = {
   deadlineAt: string | null
   update: string | null
   photos: { src: string; alt: string }[]
+  /** What the citizen picked. The model's issue_type is separate. */
+  citizenCategory: string | null
+  /** What routing actually did, when it ran. */
+  routing: RoutingRecord | null
+  /** Escalation actions recorded against this report. */
+  escalation: EscalationAction[]
+  resolvedAt: string | null
+  severityLevel: string | null
+  /** The evidence the severity score cited: road, places, weather, air. */
+  context: ReportContext | null
+}
+
+export type DepartmentRow = {
+  department: string
+  total: number
+  resolved: number
+  overdue: number
+  avg_hours: number | null
 }
 
 export class ApiError extends Error {
@@ -160,9 +259,24 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Every read costs a round trip to a database on another continent, so a short
+ * client cache keeps page navigation from paying it again. Writes never cache.
+ */
+const GET_TTL_MS = 30_000
+const getCache = new Map<string, { at: number; value: unknown }>()
+
 /* ---------------------------------------------------------------- transport */
 
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const method = (init.method ?? 'GET').toUpperCase()
+  const cacheable = method === 'GET' && init.body === undefined
+
+  if (cacheable) {
+    const hit = getCache.get(path)
+    if (hit && Date.now() - hit.at < GET_TTL_MS) return hit.value as T
+  }
+
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (init.body && !(init.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json'
@@ -187,7 +301,9 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     throw new ApiError(response.status, message)
   }
 
-  return (await response.json()) as T
+  const data = (await response.json()) as T
+  if (cacheable) getCache.set(path, { at: Date.now(), value: data })
+  return data
 }
 
 /* ------------------------------------------------------------- translation */
@@ -410,6 +526,12 @@ function baseReport(item: FeedItem): Report {
     deadlineAt: item.deadline_at,
     update: null,
     photos: photo ? [{ src: photo, alt: `${label} reported in ${locality}` }] : [],
+    citizenCategory: null,
+    routing: null,
+    escalation: [],
+    resolvedAt: null,
+    severityLevel: item.severity_level,
+    context: null,
   }
 }
 
@@ -463,6 +585,16 @@ export async function fetchReportDetail(id: string): Promise<Report | null> {
       (payload.report.ai_result as { duplicate_suggestion?: DuplicateSuggestion } | null)
         ?.duplicate_suggestion ?? null
 
+    const ai = (payload.report.ai_result ?? {}) as {
+      routing?: RoutingRecord
+      escalation?: { actions?: EscalationAction[] }
+    }
+
+    const photos = (payload.photos ?? []).map((url, index) => ({
+      src: url,
+      alt: `${report.category} reported in ${report.locality}, photo ${index + 1}`,
+    }))
+
     return {
       ...report,
       description: (payload.report.description || '').trim(),
@@ -473,6 +605,12 @@ export async function fetchReportDetail(id: string): Promise<Report | null> {
       duplicate: suggestion,
       mergedInto: payload.report.duplicate_of,
       deadlineAt: payload.report.deadline_at,
+      photos: photos.length ? photos : report.photos,
+      citizenCategory: payload.report.citizen_category ?? null,
+      routing: ai.routing ?? null,
+      escalation: ai.escalation?.actions ?? [],
+      resolvedAt: payload.report.resolved_at ?? null,
+      context: payload.report.context ?? null,
     }
   } catch (error) {
     if (error instanceof ApiError && (error.status === 404 || error.status === 400)) return null
@@ -530,26 +668,37 @@ export async function reanalyse(id: string): Promise<{ id: string; status: strin
   )
 }
 
-export type SubmitReceipt = { id: string; status: string; photo_url: string }
+export type SubmitReceipt = {
+  id: string
+  status: string
+  photo_url: string
+  photos?: number
+}
 
 export async function submitReport({
-  photo,
+  photos,
   lat,
   lng,
   description,
+  category,
+  audioText,
   idToken,
 }: {
-  photo: File
+  photos: File[]
   lat: number
   lng: number
   description: string
+  category?: string
+  audioText?: string
   idToken?: string | null
 }): Promise<SubmitReceipt> {
   const form = new FormData()
-  form.append('photo', photo)
+  for (const file of photos) form.append('photos', file)
   form.append('lat', String(lat))
   form.append('lng', String(lng))
   form.append('description', description)
+  if (category) form.append('category', category)
+  if (audioText) form.append('audio_text', audioText)
   return apiFetch<SubmitReceipt>('/reports', {
     method: 'POST',
     body: form,
@@ -557,5 +706,133 @@ export async function submitReport({
   })
 }
 
+/** The citizen says it is fixed: after photo plus where it was taken. */
+export async function submitResolution({
+  id,
+  after,
+  lat,
+  lng,
+}: {
+  id: string
+  after: File
+  lat: number
+  lng: number
+}): Promise<{ id: string; status: string }> {
+  const form = new FormData()
+  form.append('after', after)
+  form.append('lat', String(lat))
+  form.append('lng', String(lng))
+  return apiFetch<{ id: string; status: string }>(
+    `/reports/${encodeURIComponent(id)}/resolution`,
+    { method: 'POST', body: form },
+  )
+}
+
 /** The maximum the API accepts, mirrored here so the client can fail fast. */
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+
+/* ------------------------------------------------------------------ geocode */
+
+export type GeocodePlace = {
+  blockLabel: string
+  locality: string | null
+  lat: number
+  lng: number
+}
+
+/** Block-level name for a point. Never returns the exact address. */
+export async function reverseGeocode(lat: number, lng: number): Promise<GeocodePlace> {
+  return apiFetch<GeocodePlace>(`/geocode/reverse?lat=${lat}&lng=${lng}`)
+}
+
+/** Forward geocode, biased to the pilot city, with coordinates included. */
+export async function searchGeocode(query: string, limit = 6): Promise<GeocodePlace[]> {
+  const params = new URLSearchParams({ q: query, limit: String(limit) })
+  const data = await apiFetch<{ items: GeocodePlace[] }>(`/geocode/search?${params}`)
+  return data.items
+}
+
+/* -------------------------------------------------------------- deadlines */
+
+/** "Due in 3 days" / "Overdue by 5 hours", for the response-time countdown. */
+export function deadlineLabel(iso: string | null): string | null {
+  if (!iso) return null
+  const target = Date.parse(iso)
+  if (Number.isNaN(target)) return null
+
+  const hours = Math.round((target - Date.now()) / 3_600_000)
+  if (hours >= 48) return `Due in ${Math.round(hours / 24)} days`
+  if (hours > 0) return `Due in ${hours} hours`
+
+  const late = Math.abs(hours)
+  if (late >= 48) return `Overdue by ${Math.round(late / 24)} days`
+  return `Overdue by ${late} hours`
+}
+
+/* ------------------------------------------------------------- departments */
+
+/** Resolution speed and backlog per responsible body, from real rows only. */
+export async function fetchDepartments(): Promise<DepartmentRow[]> {
+  const data = await apiFetch<{ items: DepartmentRow[] }>('/departments')
+  return data.items
+}
+
+export type PollOption = { id: string; label: string; votes: number }
+export type ActivePoll = {
+  id: string
+  question: string
+  closes_at: string | null
+  options: PollOption[]
+  total: number
+}
+
+/** The open poll with live tallies. Counts come from real rows. */
+export async function fetchActivePoll(): Promise<ActivePoll> {
+  return apiFetch<ActivePoll>('/polls/active')
+}
+
+/** One vote per browser key; the key is a local id, not an identity. */
+export async function castVote(
+  pollId: string,
+  optionId: string,
+  voter: string,
+): Promise<ActivePoll> {
+  return apiFetch<ActivePoll>(`/polls/${encodeURIComponent(pollId)}/votes`, {
+    method: 'POST',
+    body: JSON.stringify({ option_id: optionId, voter }),
+  })
+}
+
+/* ---------------------------------------------------------------- comments */
+export type CommentRow = {
+  id: string
+  created_at: string
+  author_name: string
+  body: string
+}
+
+export async function fetchCommentsFor(
+  id: string,
+  { sort = 'top', offset = 0, limit = 10 }: { sort?: string; offset?: number; limit?: number } = {},
+): Promise<{ items: CommentRow[]; total: number }> {
+  const params = new URLSearchParams({
+    sort: sort === 'newest' ? 'newest' : 'top',
+    offset: String(offset),
+    limit: String(limit),
+  })
+  return apiFetch<{ items: CommentRow[]; total: number }>(
+    `/reports/${encodeURIComponent(id)}/comments?${params}`,
+  )
+}
+
+export async function postCommentTo(
+  id: string,
+  body: string,
+  idToken?: string | null,
+): Promise<CommentRow> {
+  return apiFetch<CommentRow>(`/reports/${encodeURIComponent(id)}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({ body }),
+    headers: idToken ? { Authorization: `Bearer ${idToken}` } : undefined,
+  })
+}

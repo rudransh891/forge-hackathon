@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AlertIcon, EyeIcon, EyeOffIcon } from '../icons'
+import { useI18n } from '@/lib/i18n'
 
 const BASE =
   'h-12 w-full border bg-cream-100 py-0 pr-12 pl-3 text-[16px] text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-teal-400'
@@ -13,6 +14,7 @@ export function PasswordField({
   className = '',
   ...inputProps
 }) {
+  const { t } = useI18n()
   const [visible, setVisible] = useState(false)
   const errorId = `${id}-error`
   const helperId = `${id}-helper`
@@ -49,7 +51,7 @@ export function PasswordField({
       {error ? (
         <p id={errorId} className="mt-1.5 flex items-center gap-1.5 text-sm text-coral-700">
           <AlertIcon size={16} />
-          {error}
+          {t(error)}
         </p>
       ) : helper ? (
         <p id={helperId} className="mt-1.5 text-sm text-brown-600">

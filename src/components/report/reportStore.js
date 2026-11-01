@@ -10,7 +10,7 @@
 
 import { setSupport } from '@/lib/api'
 
-const STORAGE_KEY = 'civic-pulse.support'
+const STORAGE_KEY = 'fixitbharat.support'
 
 function readStored() {
   try {

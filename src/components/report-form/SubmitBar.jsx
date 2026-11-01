@@ -1,7 +1,8 @@
-import { copy } from './formConfig'
+import { useCopy } from './formConfig'
 
 /** Submit row: fixed on mobile, inline at the end of the form on desktop. */
 export function SubmitBar({ onSaveDraft, onPost, sending, fixed }) {
+  const copy = useCopy()
   return (
     <div
       className={

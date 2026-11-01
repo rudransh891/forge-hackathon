@@ -1,5 +1,6 @@
 import { BroadcastIcon } from './icons'
 import { sortOptions, ward } from './feedConfig'
+import { useI18n } from '@/lib/i18n'
 import { FeedFilters } from './FeedFilters'
 
 function today() {
@@ -12,6 +13,7 @@ function today() {
 
 /** Sticky feed header: date line + sort on one row, chips underneath. */
 export function FeedHeader({ category, sort, onCategoryChange, onSortChange }) {
+  const { t } = useI18n()
   return (
     <div className="sticky top-16 z-30 border-b border-sand-300 bg-cream-100">
       <div className="mx-auto w-full max-w-[1120px] px-4 lg:px-0">
@@ -22,7 +24,7 @@ export function FeedHeader({ category, sort, onCategoryChange, onSortChange }) {
           </p>
 
           <label className="flex items-center gap-2 text-[13px] text-brown-600">
-            Sort
+            {t('feed.sort')}
             <span className="relative inline-flex">
               <select
                 value={sort}
@@ -31,7 +33,7 @@ export function FeedHeader({ category, sort, onCategoryChange, onSortChange }) {
               >
                 {sortOptions.map((option) => (
                   <option key={option.id} value={option.id}>
-                    {option.label}
+                    {t(`feed.sort.${option.id}`)}
                   </option>
                 ))}
               </select>

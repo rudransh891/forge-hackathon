@@ -32,7 +32,7 @@ The CLI is v4: it takes `-b radix|base|aria` and `-p nova|vega|maia|...`, not th
 
 ## The landing page
 
-`src/App.tsx` composes the Civic Pulse landing page from `src/components/site/`:
+`src/App.tsx` composes the FixItBharat landing page from `src/components/site/`:
 
 | Section | File |
 | --- | --- |

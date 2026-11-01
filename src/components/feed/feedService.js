@@ -1,6 +1,8 @@
 import { fetchFeedPage, fetchReportDetail, fetchNearby } from '@/lib/api'
+import { castVote, fetchActivePoll } from '@/lib/api'
+import { fetchCommentsFor, postCommentTo } from '@/lib/api'
 import { pageSize as defaultPageSize } from './feedConfig'
-import { notices, poll } from './feedData'
+import { notices } from './feedData'
 
 /**
  * The seam between the UI and the API. The exported names and return shapes are
@@ -43,19 +45,43 @@ export async function fetchNotices() {
 }
 
 /**
- * @returns {Promise<typeof poll>}
+ * The open poll, in the shape the cards already expect.
+ * @returns {Promise<object|null>}
  */
 export async function fetchPoll() {
-  return poll
+  try {
+    const poll = await fetchActivePoll()
+    return {
+      id: poll.id,
+      question: poll.question,
+      closes: poll.closes_at
+        ? new Date(poll.closes_at).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+          })
+        : null,
+      options: poll.options,
+      total: poll.total,
+    }
+  } catch {
+    return null
+  }
 }
 
 /**
- * Polls have no table behind them, so a vote only lives in React state.
- * @returns {Promise<{ status: 'not_configured' }>}
+ * @param {{ pollId: string, optionId: string, voter: string }} payload
+ * @returns {Promise<{ status: string, poll?: object, message?: string }>}
  */
-export async function votePoll(payload) {
-  void payload
-  return { status: 'not_configured' }
+export async function votePoll({ pollId, optionId, voter }) {
+  try {
+    const poll = await castVote(pollId, optionId, voter)
+    return { status: 'recorded', poll }
+  } catch (error) {
+    return {
+      status: 'error',
+      message: error instanceof Error ? error.message : 'That vote could not be saved.',
+    }
+  }
 }
 
 /**
@@ -75,20 +101,41 @@ export async function fetchNearbyReports({ id, locality }) {
 }
 
 /**
- * Reports have no comments table yet, so this is always empty. The section
- * still renders, with its own empty state.
+ * Comments come from the comments table; a signed-in poster is attributed, an
+ * anonymous one is labelled "Resident".
  * @returns {Promise<{ items: object[], total: number }>}
  */
-export async function fetchComments(id, query = {}) {
-  void id
-  void query
-  return { items: [], total: 0 }
+export async function fetchComments(id, { sort = 'top', offset = 0, limit = 10 } = {}) {
+  const page = await fetchCommentsFor(id, { sort, offset, limit })
+  return {
+    items: page.items.map((row) => ({
+      id: row.id,
+      locality: '',
+      ageLabel: new Date(row.created_at).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+      }),
+      author: row.author_name,
+      text: row.body,
+      helpful: 0,
+      pinned: false,
+      helpfulByMe: false,
+    })),
+    total: page.total,
+  }
 }
 
-/** @returns {Promise<{ status: 'not_configured' }>} */
-export async function postComment(payload) {
-  void payload
-  return { status: 'not_configured' }
+/** @returns {Promise<{ status: string, message?: string }>} */
+export async function postComment({ reportId, text, idToken }) {
+  try {
+    await postCommentTo(reportId, text, idToken)
+    return { status: 'ok' }
+  } catch (error) {
+    return {
+      status: 'error',
+      message: error instanceof Error ? error.message : 'That comment could not be posted.',
+    }
+  }
 }
 
 /** @returns {Promise<{ status: 'not_configured' }>} */

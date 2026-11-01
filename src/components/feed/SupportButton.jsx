@@ -1,5 +1,5 @@
 import { CheckIcon } from './icons'
-import { support as copy } from './feedConfig'
+import { useI18n } from '@/lib/i18n'
 
 /**
  * The support toggle. Label and announcements come from feedConfig, so the
@@ -13,7 +13,8 @@ export function SupportButton({
   compact = false,
   className = '',
 }) {
-  const label = supported ? copy.supportedLabel : copy.label
+  const { t } = useI18n()
+  const label = supported ? t('report.supported') : t('report.support')
 
   if (compact) {
     return (
@@ -21,7 +22,7 @@ export function SupportButton({
         type="button"
         onClick={onToggle}
         aria-pressed={supported}
-        aria-label={`${copy.label}: ${title}`}
+        aria-label={`${t('report.support')}: ${title}`}
         className={`grid size-11 shrink-0 place-items-center border focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none ${
           supported
             ? 'border-green-700 bg-green-700 text-cream-50'

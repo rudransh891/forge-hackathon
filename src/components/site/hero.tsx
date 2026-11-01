@@ -5,9 +5,10 @@ import { ArrowRight, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 import { RadioIllustration } from '@/components/site/illustrations'
-import { pilotCity } from '@/components/feed/feedConfig'
+import { useI18n } from '@/lib/i18n'
 
 export function Hero() {
+  const { t } = useI18n()
   const scope = useRef<HTMLDivElement>(null)
   const [area, setArea] = useState('')
   const [checked, setChecked] = useState<string | null>(null)
@@ -38,7 +39,7 @@ export function Hero() {
           >
             <span className="inline-flex items-center gap-1.5">
               <Radio aria-hidden className="size-3.5 text-coral-500" />
-              On the air — {pilotCity}
+              {t('hero.badge')}
             </span>
           </SectionMarker>
 
@@ -47,15 +48,14 @@ export function Hero() {
             data-reveal
             className="mt-5 font-headline text-[40px] leading-[1.04] font-semibold tracking-[-0.01em] text-brown-900 md:text-[64px] md:leading-[68px]"
           >
-            take your
+            {t('hero.lead')}
             <br />
-            city’s{' '}
-            <em className="italic font-headline font-[350] text-coral-500">pulse</em>
+            {t('hero.lead2')}{' '}
+            <em className="italic font-headline font-[350] text-coral-500">{t('hero.accent')}</em>
           </h1>
 
           <p data-reveal className="mt-6 max-w-[52ch] text-lg leading-relaxed text-brown-600">
-            See what residents are reporting in {pilotCity}, support the ones that matter
-            to you, and follow the proposed response time on every one of them.
+            {t('hero.body')}
           </p>
 
           <form
@@ -68,7 +68,7 @@ export function Hero() {
             }}
           >
             <label htmlFor="area" className="text-sm font-semibold text-brown-900">
-              Your locality in {pilotCity}
+              {t('hero.label')}
             </label>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <input
@@ -76,7 +76,7 @@ export function Hero() {
                 name="area"
                 value={area}
                 onChange={(event) => setArea(event.target.value)}
-                placeholder="e.g. Civil Lines or Kydganj"
+                placeholder={t('hero.placeholder')}
                 autoComplete="address-level2"
                 className="h-12 min-w-0 flex-1 border border-brown-600 bg-cream-50 px-3 text-base text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700"
               />
@@ -84,13 +84,13 @@ export function Hero() {
                 type="submit"
                 className="h-12 bg-green-700 px-5 text-[15px] font-semibold text-cream-50"
               >
-                See reports
+                {t('hero.button')}
               </Button>
             </div>
             <p aria-live="polite" className="mt-3 text-sm text-brown-600">
               {checked
-                ? `Opening the ${pilotCity} feed. Area filtering is not available yet, so every report in the city is listed.`
-                : 'The feed covers all of Prayagraj. Reports are matched to a locality from their coordinates.'}
+                ? t('hero.hintChecked')
+                : t('hero.hintIdle')}
             </p>
           </form>
 
@@ -99,7 +99,7 @@ export function Hero() {
             href="#how-it-works"
             className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4 hover:text-coral-700"
           >
-            Or learn how it works
+            {t('hero.learn')}
             <ArrowRight aria-hidden className="size-4" />
           </a>
         </div>
@@ -109,7 +109,7 @@ export function Hero() {
             <RadioIllustration />
             <p className="label-caps flex items-center gap-2 text-sand-300">
               <span aria-hidden className="size-1.5 bg-coral-300" />
-              {pilotCity} · on the air
+              {t('hero.panel')}
             </p>
           </div>
         </div>

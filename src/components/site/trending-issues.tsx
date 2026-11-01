@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 import { BusArt, ParkArt, RoadArt } from '@/components/site/illustrations'
 import { fetchTopReports } from '@/lib/api'
+import { useI18n } from '@/lib/i18n'
 import type { Report } from '@/lib/api'
 
 type Status = 'urgent' | 'open' | 'closing'
@@ -48,6 +49,7 @@ function StatusBadge({ status }: { status: Status }) {
 }
 
 export function TrendingIssues() {
+  const { t } = useI18n()
   const [issues, setIssues] = useState<Report[]>([])
   const [loaded, setLoaded] = useState(false)
 
@@ -81,17 +83,16 @@ export function TrendingIssues() {
           numberClassName="text-coral-300"
           dividerClassName="bg-sand-300"
         >
-          Most severe right now
+          {t('trending.marker')}
         </SectionMarker>
         <h2
           id="issues-title"
           className="mt-4 max-w-[20ch] text-[32px] leading-[1.1] text-cream-100 md:text-[44px] md:leading-[50px]"
         >
-          What needs <span className="text-coral-300">attention</span>
+          {t('trending.title')} <span className="text-coral-300">{t('trending.titleAccent')}</span>
         </h2>
         <p className="mt-3 max-w-[58ch] text-on-panel-muted">
-          The highest scored reports in Prayagraj, from a weighted score over the photo,
-          the road, nearby schools and hospitals, and the weather.
+          {t('trending.intro')}
         </p>
 
         {issues.length > 0 ? (
@@ -106,8 +107,18 @@ export function TrendingIssues() {
                       status === 'urgent' ? 'border-l-4 border-l-coral-700' : ''
                     }`}
                   >
-                    <div className="aspect-[4/3] w-full bg-sand-100">
-                      <Art className="h-full w-full" />
+                    <div className="aspect-[4/3] w-full overflow-hidden bg-sand-100">
+                      {issue.photo ? (
+                        <img
+                          src={issue.photo}
+                          alt={issue.photoAlt || issue.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <Art className="h-full w-full" />
+                      )}
                     </div>
 
                     <div className="flex flex-1 flex-col gap-3 p-4">
@@ -123,16 +134,16 @@ export function TrendingIssues() {
                       </h3>
 
                       <p className="text-sm leading-6 text-brown-600">
-                        Reported {issue.ageDays === 0 ? 'today' : `${issue.ageDays} days ago`}.
+                        {t('trending.reported')} {issue.ageDays === 0 ? t('trending.today') : `${issue.ageDays} ${t('trending.daysAgo')}`}.
                         {' '}
-                        {issue.supporters} {issue.supporters === 1 ? 'supporter' : 'supporters'}.
+                        {issue.supporters} {issue.supporters === 1 ? t('trending.supporter') : t('trending.supporters')}.
                       </p>
 
                       <a
                         href={`#/issues/${issue.id}`}
                         className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4"
                       >
-                        View report
+                        {t('trending.view')}
                         <ArrowRight aria-hidden className="size-4 text-coral-500" />
                       </a>
                     </div>
@@ -144,8 +155,8 @@ export function TrendingIssues() {
         ) : (
           <p className="mt-10 max-w-[58ch] text-on-panel-muted">
             {loaded
-              ? 'No reports have been filed yet. The first one sets the board.'
-              : 'Loading the most severe reports…'}
+              ? t('trending.empty')
+              : t('trending.loading')}
           </p>
         )}
 
@@ -157,7 +168,7 @@ export function TrendingIssues() {
           }}
           className="mt-10 h-12 border border-coral-300 bg-transparent px-5 text-[15px] font-semibold text-coral-300 hover:bg-coral-300 hover:text-brown-900"
         >
-          Browse all reports
+          {t('trending.browse')}
           <ArrowRight aria-hidden className="size-4" />
         </Button>
       </Container>

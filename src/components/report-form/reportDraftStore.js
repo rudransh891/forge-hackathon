@@ -9,7 +9,7 @@ import { useSyncExternalStore } from 'react'
  * never persist — they are blobs held in memory and revoked on removal.
  */
 
-const KEY = 'civicpulse.reportDraft.v1'
+const KEY = 'fixitbharat.reportDraft.v1'
 const EMPTY = { category: null, title: '', description: '', location: null, safetyHazard: false }
 
 // location = { blockLabel, locality, approximate: true } — never coordinates.

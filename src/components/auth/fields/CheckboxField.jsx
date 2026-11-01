@@ -1,9 +1,11 @@
 import { useId } from 'react'
 import { AlertIcon, CheckIcon } from '../icons'
+import { useI18n } from '@/lib/i18n'
 
 export function CheckboxField({ label, checked, onChange, error, id, className = '' }) {
   const fallbackId = useId()
   const inputId = id || fallbackId
+  const { t } = useI18n()
   const errorId = `${inputId}-error`
 
   return (
@@ -31,7 +33,7 @@ export function CheckboxField({ label, checked, onChange, error, id, className =
       {error ? (
         <p id={errorId} className="mt-1.5 ml-8 flex items-center gap-1.5 text-sm text-coral-700">
           <AlertIcon size={16} />
-          {error}
+          {t(error)}
         </p>
       ) : null}
     </div>

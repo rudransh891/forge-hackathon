@@ -264,3 +264,71 @@
     overflow-x: auto;
   }
 }
+
+/* ---------------------------------------------------------------
+   Maps: Leaflet. The global `border-radius: 0` already squares the
+   tiles and controls; this only tunes the chrome to the palette.
+--------------------------------------------------------------- */
+.civic-map {
+  position: relative;
+  /* Leaflet gives its panes and controls z-index up to 800. Without a stacking
+     context here they escape and paint over the sticky header (z-30/z-40). */
+  isolation: isolate;
+  border: 1px solid var(--color-sand-300);
+  background: var(--color-sand-100);
+}
+
+/* Square marker: the default Leaflet pin is rounded, which this design forbids. */
+.civic-map-pin {
+  background: var(--color-coral-500);
+  border: 2px solid var(--color-cream-50);
+  box-shadow: 0 0 0 1px var(--color-brown-900);
+}
+
+/* Severity colours on the public map. Text labels elsewhere carry the same
+   information, so colour is never the only cue. */
+.civic-map-pin--low {
+  background: var(--color-green-700);
+}
+
+.civic-map-pin--medium {
+  background: var(--color-amber-500);
+}
+
+.civic-map-pin--high {
+  background: var(--color-coral-500);
+}
+
+.civic-map-pin--critical {
+  background: var(--color-coral-700);
+}
+
+.leaflet-container {
+  font-family: var(--font-ui);
+  background: var(--color-sand-100);
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--color-brown-600);
+  background: var(--color-cream-50);
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-green-700);
+}
+
+.leaflet-control-zoom a,
+.leaflet-bar a {
+  color: var(--color-brown-900);
+  background: var(--color-cream-50);
+  border-color: var(--color-sand-300);
+  border-radius: 0;
+}
+
+.leaflet-control-zoom a:hover,
+.leaflet-bar a:hover {
+  background: var(--color-sand-100);
+  color: var(--color-brown-900);
+}

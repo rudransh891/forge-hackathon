@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { labels } from './feedConfig'
+import { useI18n } from '@/lib/i18n'
 
 /**
  * One-tap poll. Voting is local state only; results are text plus bars, so the
@@ -9,6 +9,7 @@ import { labels } from './feedConfig'
  * implying a live count.
  */
 export function PollCard({ poll }) {
+  const { t } = useI18n()
   const [voted, setVoted] = useState(null)
   const headingId = `poll-${poll.id}`
 
@@ -21,7 +22,7 @@ export function PollCard({ poll }) {
   return (
     <section aria-labelledby={headingId} className="bg-brown-900 p-4">
       <p className="text-[12px] text-on-panel-muted">
-        Poll · {poll.closes ? `closes ${poll.closes}` : labels.pollNotConnected}
+        {t('poll.marker')} · {poll.closes ? `${t('poll.closes')} ${poll.closes}` : t('poll.notConnected')}
       </p>
       <h2
         id={headingId}
@@ -69,7 +70,7 @@ export function PollCard({ poll }) {
             })}
           </ul>
           <p className="mt-3 text-[12px] text-on-panel-muted">
-            Kept in this browser only. {labels.pollNotConnected.toLowerCase()}.
+            {t('poll.thanks')}
           </p>
         </div>
       )}

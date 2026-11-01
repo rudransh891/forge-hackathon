@@ -13,12 +13,14 @@ import { ReportPosted } from './ReportPosted'
 import { SectionMarker } from './SectionMarker'
 import { SubmitBar } from './SubmitBar'
 import { TextAreaField } from './TextAreaField'
-import { copy, descMax, editWindowMinutes, requireAuthToPost, titleMax } from './formConfig'
+import { descMax, requireAuthToPost, titleMax, useCopy } from './formConfig'
 import { draft, useDraft } from './reportDraftStore'
 import { submitReport } from './reportFormService'
 import { validate } from './reportFormValidation'
 import { useIsAuthenticated } from './useIsAuthenticated'
 import { useNearbyReports } from './useNearbyReports'
+import { useSpeech } from './useSpeech'
+import { useI18n } from '@/lib/i18n'
 
 const FIELD_IDS = {
   category: 'category-group',
@@ -43,6 +45,20 @@ export function ReportFormPage() {
   const savedAnnounced = useRef(false)
   const coordsRef = useRef(null)
 
+  const copy = useCopy()
+  const { lang } = useI18n()
+
+  // Speech appends to whatever is already in the description, so a transcript
+  // and a half-typed note can coexist. The hook keeps the latest callback, so
+  // closing over the current draft value here is safe.
+  const [dictated, setDictated] = useState('')
+  const voice = useSpeech(lang, (text) => {
+    setDictated((current) => `${current} ${text}`.trim())
+    draft.set({
+      description: `${snapshot.description} ${text}`.trim().slice(0, descMax),
+    })
+  })
+
   const nearby = useNearbyReports({
     category: snapshot.category,
     title: snapshot.title,
@@ -54,7 +70,7 @@ export function ReportFormPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    document.title = 'Report an issue · Civic Pulse'
+    document.title = 'Report an issue · FixItBharat'
     headingRef.current?.focus()
     return () => {
       snapshot.photos.forEach((photo) => URL.revokeObjectURL(photo.url))
@@ -124,6 +140,7 @@ export function ReportFormPage() {
       safetyHazard: current.safetyHazard,
       photos: current.photos,
       coords: coordsRef.current,
+      audioText: dictated,
       idToken: await getIdToken(),
     })
 
@@ -168,7 +185,8 @@ export function ReportFormPage() {
               tabIndex={-1}
               className="mt-2 font-display text-[32px] leading-tight text-brown-900 focus-visible:outline-none lg:text-[44px]"
             >
-              Report an <span className="text-coral-500">{copy.titleAccent}</span>
+              {copy.titleLead}{' '}
+              <span className="text-coral-500">{copy.titleAccent}</span>
             </h1>
             <p className="mt-1 text-[14px] text-brown-600">{copy.subline}</p>
 
@@ -320,6 +338,29 @@ export function ReportFormPage() {
                   maxLength={descMax}
                   placeholder={copy.detailsPlaceholder}
                 />
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={voice.toggle}
+                    disabled={!voice.supported}
+                    aria-pressed={voice.listening}
+                    className="inline-flex h-11 items-center gap-2 border border-brown-600 px-3 text-[13px] font-semibold text-brown-900 transition-colors hover:bg-sand-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:border-sand-300 disabled:text-brown-600"
+                  >
+                    <span aria-hidden>{voice.listening ? '■' : '🎙'}</span>
+                    {voice.listening ? copy.voiceStop : copy.voiceStart}
+                  </button>
+                  <p className="mt-1 text-[12px] text-brown-600">
+                    {!voice.supported
+                      ? copy.voiceUnsupported
+                      : voice.listening
+                        ? copy.voiceListening
+                        : copy.voiceNote}
+                  </p>
+                  {voice.error ? (
+                    <p className="mt-1 text-[12px] text-coral-700">{voice.error}</p>
+                  ) : null}
+                </div>
               </section>
 
               <div className="lg:hidden">
@@ -354,8 +395,7 @@ export function ReportFormPage() {
               </label>
 
               <p className="text-[13px] text-brown-600">
-                Posts show as “Resident, {snapshot.location?.locality ?? 'your area'}”. You can
-                edit for {editWindowMinutes} minutes.
+                Posts show as “Resident, {snapshot.location?.locality ?? 'your area'}”.
               </p>
 
               <SubmitBar

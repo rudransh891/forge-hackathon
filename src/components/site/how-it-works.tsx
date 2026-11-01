@@ -1,4 +1,5 @@
 import { Container, SectionMarker } from '@/components/site/layout'
+import { useI18n } from '@/lib/i18n'
 
 const STEPS = [
   {
@@ -19,6 +20,7 @@ const STEPS = [
 ]
 
 export function HowItWorks() {
+  const { t } = useI18n()
   return (
     <section
       id="how-it-works"
@@ -32,13 +34,13 @@ export function HowItWorks() {
           numberClassName="text-coral-700"
           dividerClassName="bg-sand-300"
         >
-          How it works
+          {t('how.marker')}
         </SectionMarker>
         <h2
           id="how-title"
           className="mt-4 max-w-[22ch] text-[32px] leading-[1.1] text-brown-900 md:text-[44px] md:leading-[50px]"
         >
-          Three steps to <span className="text-coral-500">being heard</span>
+          {t('how.title')} <span className="text-coral-500">{t('how.titleAccent')}</span>
         </h2>
 
         <ol className="mt-10 grid list-none gap-4 p-0 md:grid-cols-3">
@@ -51,9 +53,9 @@ export function HowItWorks() {
                 {step.index}
               </span>
               <h3 className="mt-5 font-sans text-lg font-semibold text-brown-900">
-                {step.title}
+                {t(`how.${step.index}.title`)}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-brown-600">{step.body}</p>
+              <p className="mt-2 text-sm leading-6 text-brown-600">{t(`how.${step.index}.body`)}</p>
             </li>
           ))}
         </ol>

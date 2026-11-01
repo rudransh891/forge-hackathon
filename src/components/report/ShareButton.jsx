@@ -4,7 +4,10 @@ import { useState } from 'react'
  * Web Share when available, clipboard when not, and a visible readonly field
  * when the clipboard is blocked. Announced through its own live region.
  */
+import { useI18n } from '@/lib/i18n'
+
 export function ShareButton({ title, className = '', fullWidth = false }) {
+  const { t } = useI18n()
   const [message, setMessage] = useState('')
   const [manualUrl, setManualUrl] = useState(null)
 
@@ -34,7 +37,7 @@ export function ShareButton({ title, className = '', fullWidth = false }) {
       <button
         type="button"
         onClick={onShare}
-        aria-label="Share this report"
+        aria-label={t('report.share')}
         className={`inline-flex h-11 items-center justify-center gap-2 border border-green-700 px-3 text-green-700 transition-colors duration-[var(--motion-base)] hover:bg-green-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none ${fullWidth ? 'w-full' : ''}`}
       >
         <svg viewBox="0 0 24 24" width={16} height={16} aria-hidden="true" fill="currentColor">

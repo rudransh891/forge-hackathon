@@ -1,6 +1,7 @@
 import { feedNavigation } from '@/components/report/feedNavigation'
 import { supportCount } from '@/components/report/reportStore'
 import { CommentIcon } from './icons'
+import { useI18n } from '@/lib/i18n'
 import { ReportPhoto } from './ReportPhoto'
 import { StatusTag, UpdateNote, VerificationMark } from './StatusTag'
 import { SupportButton } from './SupportButton'
@@ -11,6 +12,7 @@ function metaText(report) {
 
 /** Standard report: meta, headline, 72px thumbnail, footer with support. */
 export function ReportCard({ report, supported, onSupport }) {
+  const { t } = useI18n()
   const headlineId = `report-${report.id}`
   return (
     <article
@@ -69,10 +71,10 @@ export function ReportCard({ report, supported, onSupport }) {
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="flex items-center gap-3 text-[12px] text-brown-600">
-          <span>{supportCount(report.id, report.supporters)} supporters</span>
+          <span>{supportCount(report.id, report.supporters)} {t('feed.supporters')}</span>
           <span className="inline-flex items-center gap-1">
             <CommentIcon size={13} className="text-coral-500" />
-            {report.comments} comments
+            {report.comments} {t('feed.comments')}
           </span>
         </p>
         <SupportButton

@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 import os
 import threading
 import time
@@ -83,3 +83,74 @@ def reverse_geocode(lat: float, lng: float) -> dict:
     }
     _cache[key] = result
     return result
+
+
+# Search is biased towards the pilot city but not restricted to it: a citizen
+# outside the boundary should still find their street and be told (by routing)
+# that no complaint was sent.
+SEARCH_URL = "https://nominatim.openstreetmap.org/search"
+SEARCH_VIEWBOX = "81.60,25.55,81.95,25.30"  # left,top,right,bottom
+
+
+def search_places(query: str, limit: int = 6) -> list[dict]:
+    """Forward geocode within the pilot area. Returns [] on any failure; never raises."""
+    global _last_call
+
+    text = (query or "").strip()
+    if len(text) < 3:
+        return []
+
+    contact = os.getenv("NOMINATIM_CONTACT", "").strip()
+    if not contact:
+        return []
+
+    params = {
+        "format": "jsonv2",
+        "q": text,
+        "limit": max(1, min(limit, 8)),
+        "addressdetails": 1,
+        "accept-language": "en",
+        "viewbox": SEARCH_VIEWBOX,
+        "bounded": 0,
+    }
+    headers = {"User-Agent": f"FixItBharat/0.1 (civic grievance hackathon; {contact})"}
+
+    with _lock:  # one request at a time, spaced out
+        wait = MIN_INTERVAL_SECONDS - (time.monotonic() - _last_call)
+        if wait > 0:
+            time.sleep(wait)
+        try:
+            response = httpx.get(
+                SEARCH_URL, params=params, headers=headers, timeout=TIMEOUT_SECONDS
+            )
+            _last_call = time.monotonic()
+            response.raise_for_status()
+            data = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            log.warning("nominatim search failed: %s", type(exc).__name__)
+            return []
+
+    if not isinstance(data, list):
+        return []
+
+    places = []
+    for item in data:
+        try:
+            lat = float(item["lat"])
+            lng = float(item["lon"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        addr = item.get("address") or {}
+        places.append(
+            {
+                "lat": lat,
+                "lng": lng,
+                "road": _first(addr, "road", "pedestrian", "footway"),
+                "locality": _first(
+                    addr, "suburb", "neighbourhood", "city_district", "quarter"
+                )
+                or _first(addr, "city", "town", "village", "municipality"),
+                "display": item.get("display_name"),
+            }
+        )
+    return places

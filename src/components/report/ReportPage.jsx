@@ -2,7 +2,14 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { useAuthModal } from '@/components/auth/AuthModalProvider'
 import { fetchReport, fetchNearbyReports } from '@/components/feed/feedService'
 import { labels } from '@/components/feed/feedConfig'
-import { answerDuplicate, dateTimeLabel, reanalyse } from '@/lib/api'
+import {
+  answerDuplicate,
+  dateTimeLabel,
+  deadlineLabel,
+  reanalyse,
+  submitResolution,
+} from '@/lib/api'
+import { useI18n } from '@/lib/i18n'
 import { CommentsSection } from './CommentsSection'
 import { LocationBlock } from './LocationBlock'
 import { NearbyReports } from './NearbyReports'
@@ -39,6 +46,7 @@ function SectionHeading({ id, children }) {
  * only the level would hide that.
  */
 function SeveritySection({ report, onReanalyse, busy }) {
+  const { t } = useI18n()
   const severity = report.severity
   const canRetry = RETRYABLE.has(report.rawStatus)
 
@@ -56,7 +64,7 @@ function SeveritySection({ report, onReanalyse, busy }) {
   if (!severity) {
     return (
       <section aria-labelledby="severity-heading" className="mt-6 border-t border-sand-300 pt-4">
-        <SectionHeading id="severity-heading">Severity</SectionHeading>
+        <SectionHeading id="severity-heading">{t('report.severity')}</SectionHeading>
         <p className="mt-1 text-[14px] text-brown-600">
           Not scored yet. A score needs a readable photo, and the road and nearby
           places around it.
@@ -72,7 +80,7 @@ function SeveritySection({ report, onReanalyse, busy }) {
   return (
     <section aria-labelledby="severity-heading" className="mt-6 border-t border-sand-300 pt-4">
       <div className="flex items-baseline justify-between gap-3">
-        <SectionHeading id="severity-heading">Severity</SectionHeading>
+        <SectionHeading id="severity-heading">{t('report.severity')}</SectionHeading>
         <p className="font-mono text-[12px] text-brown-600">
           {severity.coverage ?? 'partial'}
         </p>
@@ -96,6 +104,15 @@ function SeveritySection({ report, onReanalyse, busy }) {
           ) : null}
         </div>
       </div>
+
+      {report.citizenCategory ? (
+        <p className="mt-1 text-[12px] text-brown-600">
+          You filed this under {report.citizenCategory}
+          {report.category && report.category !== report.citizenCategory
+            ? `; the photo was read as ${report.category}.`
+            : '.'}
+        </p>
+      ) : null}
 
       <div aria-hidden className="mt-3 flex gap-1">
         {[0, 1, 2, 3, 4].map((index) => (
@@ -145,8 +162,11 @@ function SeveritySection({ report, onReanalyse, busy }) {
 
       {severity.deadline_at ? (
         <p className="mt-3 text-[13px] text-brown-600">
-          Proposed response time: {dateTimeLabel(severity.deadline_at)}.
-          {severity.deadline_note ? ` ${severity.deadline_note}.` : ''}
+          Proposed response time: {dateTimeLabel(severity.deadline_at)}
+          {deadlineLabel(severity.deadline_at)
+            ? ` · ${deadlineLabel(severity.deadline_at)}`
+            : ''}
+          .{severity.deadline_note ? ` ${severity.deadline_note}.` : ''}
         </p>
       ) : null}
 
@@ -213,6 +233,267 @@ function DuplicatePrompt({ report, onAnswer, busy }) {
   )
 }
 
+/**
+ * What routing actually did.
+ *
+ * The backend stores the complaint text and the delivery record on the report;
+ * showing them is the difference between claiming routing and demonstrating it.
+ * When nothing was sent, this says which of the three reasons applied.
+ */
+function RoutingPanel({ report }) {
+  const { t } = useI18n()
+  const routing = report.routing
+  const missing = report.severity?.missing ?? []
+  const waitingOnDuplicate = Boolean(report.duplicate) && !report.duplicate?.response
+
+  let body
+  if (routing) {
+    if (routing.inside_pilot_area === false) {
+      body = (
+        <>
+          <p>
+            Outside the Prayagraj pilot area, so no complaint was sent and the report
+            stays on the board as a record.
+          </p>
+          {routing.citizen_option?.name ? (
+            <p className="mt-1 text-[13px] text-brown-600">
+              File it yourself with {routing.citizen_option.name}
+              {routing.citizen_option.helpline ? ` · ${routing.citizen_option.helpline}` : ''}
+              {routing.citizen_option.portal ? (
+                <>
+                  {' · '}
+                  <a
+                    href={routing.citizen_option.portal}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4"
+                  >
+                    open the portal
+                  </a>
+                </>
+              ) : null}
+            </p>
+          ) : null}
+        </>
+      )
+    } else if (routing.delivery?.ok) {
+      body = (
+        <p>
+          Complaint emailed to the project’s test inbox on{' '}
+          {dateTimeLabel(
+            routing.delivery.delivered_at ?? routing.delivery.attempted_at ?? null,
+          )}
+          . It was not sent to a government department.
+        </p>
+      )
+    } else {
+      body = (
+        <p>
+          Complaint prepared, but the email could not be sent
+          {routing.delivery?.error ? ` (${routing.delivery.error})` : ''}. It is retried by
+          the escalation agent.
+        </p>
+      )
+    }
+  } else if (missing.length) {
+    body = (
+      <p>
+        Not routed: the severity is still provisional because {missing.join(', ')} could
+        not be checked.
+      </p>
+    )
+  } else if (waitingOnDuplicate) {
+    body = <p>Not routed yet: waiting for your answer to the duplicate question above.</p>
+  } else if (report.rawStatus === 'received' || report.rawStatus === 'analysed') {
+    body = <p>Not routed yet: the analysis is still running.</p>
+  } else {
+    body = <p>Nothing has been sent for this report.</p>
+  }
+
+  return (
+    <section aria-labelledby="routing-heading" className="mt-6 bg-cream-50 p-4">
+      <h2 id="routing-heading" className="text-[16px] font-semibold text-brown-900">
+        {t('report.sent')}
+      </h2>
+      <div className="mt-1 text-[14px] leading-6 text-brown-900">{body}</div>
+
+      {routing?.complaint_text ? (
+        <details className="mt-3">
+          <summary className="cursor-pointer text-[13px] font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4">
+            Read the complaint
+          </summary>
+          {routing.complaint_subject ? (
+            <p className="mt-2 text-[12px] font-semibold text-brown-900">
+              {routing.complaint_subject}
+            </p>
+          ) : null}
+          <pre className="mt-1 max-h-[320px] overflow-auto border border-sand-300 bg-cream-100 p-3 text-[12px] leading-5 whitespace-pre-wrap text-brown-900">
+            {routing.complaint_text}
+          </pre>
+        </details>
+      ) : null}
+    </section>
+  )
+}
+
+/** Escalation actions the agent has recorded. Empty until a deadline passes. */
+function EscalationPanel({ actions }) {
+  if (!actions || actions.length === 0) return null
+
+  return (
+    <section aria-labelledby="escalation-heading" className="mt-6 bg-coral-100 p-4">
+      <h2 id="escalation-heading" className="text-[16px] font-semibold text-brown-900">
+        Escalation
+      </h2>
+      <ol className="mt-2 list-none p-0 text-[13px] leading-6 text-brown-900">
+        {actions.map((action, index) => (
+          <li
+            key={`${action.at}-${index}`}
+            className="border-b border-coral-300 py-1.5 last:border-b-0"
+          >
+            <span className="font-semibold">
+              Level {action.level} ({action.name})
+            </span>{' '}
+            · {dateTimeLabel(action.at)} ·{' '}
+            {action.ok ? 'sent' : `failed${action.error ? ` (${action.error})` : ''}`}
+            {typeof action.late_hours === 'number' ? ` · ${action.late_hours}h late` : ''}
+          </li>
+        ))}
+      </ol>
+      <p className="mt-2 text-[12px] text-brown-600">
+        Sent to the project’s test inbox, never to an officer.
+      </p>
+    </section>
+  )
+}
+
+/** "Is it fixed?" — the citizen sends an after photo, a model compares it. */
+function ResolutionBox({ report, busy, onSubmit }) {
+  const [file, setFile] = useState(null)
+
+  if (report.status === 'resolved' || report.status === 'merged') return null
+
+  return (
+    <section aria-labelledby="fixed-heading" className="mt-6 border border-sand-300 p-4">
+      <h2 id="fixed-heading" className="text-[16px] font-semibold text-brown-900">
+        Is it fixed?
+      </h2>
+      <p className="mt-1 max-w-[65ch] text-[13px] leading-6 text-brown-600">
+        Send an after photo taken at the same place. A model compares it with the original
+        and decides whether the problem is gone; the answer is recorded on the timeline.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+          aria-label="After photo"
+          className="h-11 max-w-full border border-brown-600 bg-cream-50 px-2 text-[13px] text-brown-900"
+        />
+        <button
+          type="button"
+          disabled={!file || busy}
+          onClick={() => {
+            if (file) onSubmit(file)
+          }}
+          className="h-11 shrink-0 border border-green-700 px-4 text-[14px] font-semibold text-green-700 transition-colors hover:bg-green-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:border-sand-300 disabled:text-brown-600"
+        >
+          {busy ? 'Sending…' : 'Send after photo'}
+        </button>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * The evidence the severity score cited.
+ *
+ * The enrichment phase has always stored this — road class, schools and
+ * hospitals with distances, rain, air quality — and nothing rendered it. It is
+ * what turns "high severity" into something a judge can check.
+ */
+function EvidencePanel({ report }) {
+  const { t } = useI18n()
+  const context = report.context
+  if (!context) return null
+
+  const road = context.road
+  const places = context.places
+  const weather = context.weather
+  const air = context.air_quality
+  const missing = context.missing ?? []
+
+  const nearby = [...(places?.schools ?? []), ...(places?.hospitals ?? [])]
+    .sort((a, b) => a.distance_m - b.distance_m)
+    .slice(0, 3)
+
+  const rows = []
+  if (road?.ok) {
+    rows.push({
+      label: 'Road',
+      value: road.highway
+        ? `${road.highway}${road.name ? ` · ${road.name}` : ''}${
+            typeof road.distance_m === 'number' ? ` · ${road.distance_m} m away` : ''
+          }`
+        : 'No mapped road within 40 m',
+    })
+  }
+  if (places?.ok) {
+    rows.push({
+      label: 'Nearby',
+      value: nearby.length
+        ? nearby.map((place) => `${place.name} (${place.type}, ${place.distance_m} m)`).join(' · ')
+        : `No school or hospital mapped within ${places.radius_m ?? 200} m`,
+    })
+    rows.push({
+      label: 'Bus stops',
+      value: `${places.bus_stops ?? 0} within ${places.radius_m ?? 200} m`,
+    })
+  }
+  if (weather?.ok) {
+    rows.push({
+      label: 'Weather',
+      value: `${weather.rain_last_24h_mm ?? '—'} mm rain in the last 24 h · ${
+        weather.temperature_c ?? '—'
+      } °C`,
+    })
+  }
+  if (air?.ok) {
+    rows.push({
+      label: 'Air',
+      value: `US AQI ${air.us_aqi ?? '—'}${air.band ? ` (${air.band})` : ''}, modelled`,
+    })
+  }
+
+  if (rows.length === 0) return null
+
+  return (
+    <section aria-labelledby="evidence-heading" className="mt-6 bg-cream-50 p-4">
+      <h2 id="evidence-heading" className="text-[16px] font-semibold text-brown-900">
+        {t('report.evidence')}
+      </h2>
+      <dl className="mt-2 grid gap-1 text-[13px]">
+        {rows.map((row) => (
+          <div key={row.label} className="flex gap-2">
+            <dt className="w-[92px] shrink-0 font-medium text-brown-900">{row.label}</dt>
+            <dd className="min-w-0 flex-1 text-brown-600">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-2 text-[12px] leading-5 text-brown-600">
+        Read at the time of the report, from OpenStreetMap and Open-Meteo. An empty nearby
+        list means nothing is mapped there, not that nothing exists.
+      </p>
+      {missing.length ? (
+        <p className="mt-1 text-[12px] text-coral-700">
+          Not checked: {missing.join(', ')}.
+        </p>
+      ) : null}
+    </section>
+  )
+}
+
 export function ReportPage({ id }) {
   const [report, setReport] = useState(null)
   const [nearby, setNearby] = useState([])
@@ -221,6 +502,8 @@ export function ReportPage({ id }) {
   const [announcement, setAnnouncement] = useState('')
   const [busy, setBusy] = useState(false)
   const [polls, setPolls] = useState(0)
+  const [resolutionBusy, setResolutionBusy] = useState(false)
+  const [resolutionRequested, setResolutionRequested] = useState(false)
   const { openAuthModal } = useAuthModal()
   const store = useSyncExternalStore(subscribe, getSnapshot)
 
@@ -263,31 +546,37 @@ export function ReportPage({ id }) {
 
   useEffect(() => {
     if (!report) return
-    document.title = `${report.title} · Civic Pulse`
+    document.title = `${report.title} · FixItBharat`
     document.getElementById('report-title')?.focus()
   }, [report])
 
   useEffect(() => {
     const previous = document.title
     return () => {
-      document.title = previous.includes('Civic Pulse') ? 'Civic Pulse — FORGE HACKATHON' : previous
+      document.title = previous.includes('FixItBharat') ? 'FixItBharat — FORGE HACKATHON' : previous
     }
   }, [])
 
-  // A report is unfinished until it has a severity. Poll, then stop.
+  // A report is unfinished until it has a severity, and an after photo is
+  // unfinished until the comparison lands on the timeline. Poll, then stop.
   const analysing =
     Boolean(report) &&
     !report.severity &&
     (report.rawStatus === 'received' || report.rawStatus === 'analysed')
 
+  const resolving =
+    resolutionRequested && Boolean(report) && report.status !== 'resolved'
+
+  const waiting = analysing || resolving
+
   useEffect(() => {
-    if (!analysing || polls >= MAX_POLLS) return undefined
+    if (!waiting || polls >= MAX_POLLS) return undefined
     const timer = setTimeout(() => {
       setPolls((count) => count + 1)
       load({ silent: true })
     }, POLL_MS)
     return () => clearTimeout(timer)
-  }, [analysing, report, polls, load])
+  }, [waiting, report, polls, load])
 
   const nearbyId = report?.id
   const nearbyLocality = report?.locality
@@ -374,6 +663,28 @@ export function ReportPage({ id }) {
     }
   }
 
+  const onResolution = async (file) => {
+    setResolutionBusy(true)
+    try {
+      await submitResolution({
+        id: report.id,
+        after: file,
+        lat: report.lat,
+        lng: report.lng,
+      })
+      setResolutionRequested(true)
+      setPolls(0)
+      setAnnouncement('After photo sent. Comparing it with the original…')
+      await load({ silent: true })
+    } catch (error) {
+      setAnnouncement(
+        error instanceof Error ? error.message : 'The after photo could not be sent.',
+      )
+    } finally {
+      setResolutionBusy(false)
+    }
+  }
+
   const goBack = () => {
     if (feedNavigation.cameFromFeed) {
       feedNavigation.restoringFeed = true
@@ -395,7 +706,7 @@ export function ReportPage({ id }) {
             className="inline-flex h-11 items-center gap-1.5 text-[14px] text-brown-900 hover:text-coral-700 hover:underline hover:decoration-coral-500 hover:decoration-2 hover:underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
           >
             <span aria-hidden>←</span>
-            {labels.backToReports}
+            {t('report.back')}
           </button>
           <div className="lg:hidden">
             <ShareButton title={report.title} />
@@ -474,6 +785,14 @@ export function ReportPage({ id }) {
               </p>
             ) : null}
 
+            {resolving && !analysing ? (
+              <p aria-live="polite" className="mt-3 text-[13px] text-brown-600">
+                {polls >= MAX_POLLS
+                  ? 'The comparison is taking longer than usual. Reload to see the outcome.'
+                  : 'Comparing your after photo with the original…'}
+              </p>
+            ) : null}
+
             {report.photos?.length ? (
               <div className="mt-4">
                 <PhotoGallery photos={report.photos} title={report.title} />
@@ -495,6 +814,16 @@ export function ReportPage({ id }) {
             </div>
 
             <SeveritySection report={report} onReanalyse={onReanalyse} busy={busy} />
+
+            <EvidencePanel report={report} />
+
+            <RoutingPanel report={report} />
+            <EscalationPanel actions={report.escalation} />
+            <ResolutionBox
+              report={report}
+              busy={resolutionBusy}
+              onSubmit={onResolution}
+            />
 
             <div className="mt-6 flex flex-col gap-4 border-t border-sand-300 pt-4">
               {report.updates?.length ? (
@@ -540,7 +869,13 @@ export function ReportPage({ id }) {
               </div>
             ) : null}
             <div className="mt-4">
-              <LocationBlock addressBlock={report.addressBlock} withMap mapHref={mapHref} />
+              <LocationBlock
+                addressBlock={report.addressBlock}
+                withMap
+                mapHref={mapHref}
+                lat={report.lat}
+                lng={report.lng}
+              />
             </div>
           </aside>
         </div>

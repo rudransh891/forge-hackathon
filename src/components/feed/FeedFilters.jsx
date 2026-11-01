@@ -1,11 +1,13 @@
 import { useRef } from 'react'
 import { categories } from './feedConfig'
+import { useI18n } from '@/lib/i18n'
 
 /**
  * Category chips. Horizontal scroller on mobile (next chip peeks at the edge,
  * no fade), wrapped row on desktop. 44px tap targets, aria-pressed per chip.
  */
 export function FeedFilters({ active, onChange }) {
+  const { t } = useI18n()
   const listRef = useRef(null)
 
   const select = (category, element) => {
@@ -22,7 +24,7 @@ export function FeedFilters({ active, onChange }) {
     <div
       ref={listRef}
       role="group"
-      aria-label="Filter reports by category"
+      aria-label={t('feed.filters')}
       className="ticker-strip -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0"
     >
       {categories.map((category) => {

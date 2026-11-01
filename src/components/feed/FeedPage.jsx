@@ -8,12 +8,15 @@ import { PollCard } from './PollCard'
 import { ReportButton } from './ReportButton'
 import { ReportCard } from './ReportCard'
 import { AlertIcon } from './icons'
-import { briefThreshold, labels, ward } from './feedConfig'
+import { briefThreshold, ward } from './feedConfig'
+import { useI18n } from '@/lib/i18n'
 import { fetchNotices, fetchPoll } from './feedService'
 import { useFeed } from './useFeed'
 import { feedNavigation } from '@/components/report/feedNavigation'
+import { ReportsMap } from '@/components/map/CivicMap'
 
 export function FeedPage() {
+  const { t } = useI18n()
   const feed = useFeed()
   const [notices, setNotices] = useState([])
   const [poll, setPoll] = useState(null)
@@ -87,10 +90,31 @@ export function FeedPage() {
       <NoticesTicker notices={notices} />
 
       <main className="mx-auto w-full max-w-[1120px] px-4 pb-24 lg:px-0 lg:pb-16">
-        <h1 className="sr-only">Reports in {ward}</h1>
+        <h1 className="sr-only">{t('feed.title')} {ward}</h1>
         <p aria-live="polite" className="sr-only">
           {feed.announcement}
         </p>
+
+        {feed.items.length ? (
+          <section aria-label="Reports on the map" className="mt-4 border-b border-sand-300 pb-4">
+            <ReportsMap
+              points={feed.items.map((report) => ({
+                id: report.id,
+                lat: report.lat,
+                lng: report.lng,
+                label: report.title,
+                level: report.severityLevel,
+              }))}
+              centre={[feed.items[0].lat, feed.items[0].lng]}
+              zoom={12}
+              className="h-[260px] w-full lg:h-[320px]"
+            />
+            <p className="mt-1.5 text-[12px] text-brown-600">
+              Every report loaded here, coloured by severity: green low, amber medium, coral
+              high, dark coral critical. Open a marker to read the report.
+            </p>
+          </section>
+        ) : null}
 
         <div ref={listTop} className="scroll-mt-[190px]" />
 
@@ -132,7 +156,7 @@ export function FeedPage() {
                   id="briefs-heading"
                   className="border-b border-sand-300 pb-2 text-[13px] font-semibold text-brown-600"
                 >
-                  Briefs
+                  {t('feed.briefs')}
                 </h2>
                 <ul className="list-none p-0">
                   {briefs.map((report) => (
@@ -161,26 +185,26 @@ export function FeedPage() {
                 className="mt-6 flex flex-wrap items-center gap-3 bg-coral-100 px-3 py-3 text-[14px] text-coral-700"
               >
                 <AlertIcon size={16} />
-                <span>{labels.errorState}</span>
+                <span>{t('feed.error')}</span>
                 <button
                   type="button"
                   onClick={feed.retry}
                   className="h-11 border border-coral-700 px-4 text-[13px] font-semibold focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
                 >
-                  Retry
+                  {t('feed.retry')}
                 </button>
               </div>
             ) : null}
 
             {feed.status !== 'loading' && feed.items.length === 0 ? (
               <div className="mt-6 text-[15px] text-brown-600">
-                <p>{labels.emptyState}</p>
+                <p>{t('feed.empty')}</p>
                 <button
                   type="button"
                   onClick={openReport}
                   className="mt-2 text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
                 >
-                  {labels.reportIssue}
+                  {t('feed.reportIssue')}
                 </button>
               </div>
             ) : null}
@@ -193,12 +217,12 @@ export function FeedPage() {
                 onClick={feed.loadMore}
                 className="mt-6 h-12 w-full border border-brown-600 text-[15px] font-semibold text-brown-900 transition-colors duration-[var(--motion-base)] hover:bg-sand-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
               >
-                {labels.loadMore}
+                {t('feed.loadMore')}
               </button>
             ) : null}
 
             {feed.status === 'idle' && !feed.hasMore && feed.items.length > 0 ? (
-              <p className="mt-6 text-[15px] text-brown-600">{labels.endState}</p>
+              <p className="mt-6 text-[15px] text-brown-600">{t('feed.end')}</p>
             ) : null}
           </div>
 

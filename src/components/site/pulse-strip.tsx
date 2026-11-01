@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Container } from '@/components/site/layout'
 import { fetchStats } from '@/lib/api'
+import { useI18n } from '@/lib/i18n'
 import type { BackendStats } from '@/lib/api'
 
 /**
@@ -8,6 +9,7 @@ import type { BackendStats } from '@/lib/api'
  * means the API has not answered yet, which is the honest thing to show.
  */
 export function PulseStrip() {
+  const { t } = useI18n()
   const [stats, setStats] = useState<BackendStats | null>(null)
 
   useEffect(() => {
@@ -25,10 +27,10 @@ export function PulseStrip() {
   }, [])
 
   const tiles = [
-    { value: stats?.total, label: 'reports filed' },
-    { value: stats?.open, label: 'open issues' },
-    { value: stats?.resolved, label: 'resolved' },
-    { value: stats?.in_progress, label: 'being analysed' },
+    { value: stats?.total, label: t('pulse.reports') },
+    { value: stats?.open, label: t('pulse.open') },
+    { value: stats?.resolved, label: t('pulse.resolved') },
+    { value: stats?.overdue, label: t('pulse.overdue') },
   ]
 
   const format = (value: number | undefined) =>

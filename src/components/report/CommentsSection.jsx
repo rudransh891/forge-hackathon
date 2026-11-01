@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchComments, flagComment } from '@/components/feed/feedService'
 import { detailCommentsPageSize, labels } from '@/components/feed/feedConfig'
+import { useI18n } from '@/lib/i18n'
 import { CommentComposer } from './CommentComposer'
 import { CommentItem } from './CommentItem'
 
@@ -9,6 +10,7 @@ import { CommentItem } from './CommentItem'
  * The top comment tag only exists under the "Top" sort with at least 5 helpful.
  */
 export function CommentsSection({ reportId, commentCount, onRequireAuth }) {
+  const { t } = useI18n()
   const [sort, setSort] = useState('top')
   const [items, setItems] = useState([])
   const [offset, setOffset] = useState(0)
@@ -57,7 +59,7 @@ export function CommentsSection({ reportId, commentCount, onRequireAuth }) {
     <section aria-labelledby="comments-heading">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="comments-heading" className="text-[16px] font-semibold text-brown-900">
-          Comments · {total}
+          {t('report.comments')} · {total}
         </h2>
         <label className="flex items-center gap-2 text-[13px] text-brown-600">
           Sort
@@ -84,7 +86,11 @@ export function CommentsSection({ reportId, commentCount, onRequireAuth }) {
         </label>
       </div>
 
-      <CommentComposer reportId={reportId} onRequireAuth={onRequireAuth} />
+      <CommentComposer
+        reportId={reportId}
+        onRequireAuth={onRequireAuth}
+        onPosted={() => load(sort, 0, 3)}
+      />
 
       <p aria-live="polite" className="sr-only">
         {announcement}

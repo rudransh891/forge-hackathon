@@ -1,9 +1,11 @@
 import { feedNavigation } from '@/components/report/feedNavigation'
 import { supportCount } from '@/components/report/reportStore'
 import { SupportButton } from './SupportButton'
+import { useI18n } from '@/lib/i18n'
 
 /** One-line low-priority report: title, count, 44px support toggle. */
 export function BriefRow({ report, supported, onSupport }) {
+  const { t } = useI18n()
   return (
     <li className="flex items-center gap-3 border-b border-sand-300 py-2.5">
       <h2 className="min-w-0 flex-1 truncate font-display text-[15px] leading-6 text-brown-900">
@@ -19,7 +21,7 @@ export function BriefRow({ report, supported, onSupport }) {
         </a>
       </h2>
       <span className="shrink-0 text-[12px] text-brown-600">
-        {supportCount(report.id, report.supporters)} supporters
+        {supportCount(report.id, report.supporters)} {t('feed.supporters')}
       </span>
       <SupportButton
         title={report.title}

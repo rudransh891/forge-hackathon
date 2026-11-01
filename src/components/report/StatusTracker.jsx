@@ -1,5 +1,6 @@
 import { trackerSteps } from '@/components/feed/feedConfig'
 import { CheckIcon } from '@/components/feed/icons'
+import { useI18n } from '@/lib/i18n'
 
 const ORDER = trackerSteps.map((step) => step.id)
 
@@ -45,8 +46,9 @@ function labelClass(state) {
 
 /** Mobile tracker: four dots on a rail with the labels underneath. */
 export function TrackerHorizontal({ current, dates = {} }) {
+  const { t } = useI18n()
   return (
-    <ol aria-label="Report progress" className="grid grid-cols-4 gap-0">
+    <ol aria-label={t('tracker.progress')} className="grid grid-cols-4 gap-0">
       {trackerSteps.map((step, index) => {
         const state = stepState(step.id, current)
         const isFixed = step.id === 'fixed'
@@ -58,7 +60,7 @@ export function TrackerHorizontal({ current, dates = {} }) {
             className="flex flex-col items-center"
           >
             <span className="sr-only">
-              {step.label}, {STATE_WORD[state]}
+              {t(`tracker.${step.id}`)}, {STATE_WORD[state]}
             </span>
             <div aria-hidden className="flex w-full items-center">
               <span
@@ -76,7 +78,7 @@ export function TrackerHorizontal({ current, dates = {} }) {
               />
             </div>
             <span aria-hidden className={`mt-2 text-center text-[12px] ${labelClass(state)}`}>
-              {step.label}
+              {t(`tracker.${step.id}`)}
             </span>
             {dates[step.id] ? (
               <span aria-hidden className="text-[12px] text-brown-600">
@@ -92,8 +94,9 @@ export function TrackerHorizontal({ current, dates = {} }) {
 
 /** Desktop tracker: dots down the left, labels and dates to the right. */
 export function TrackerVertical({ current, dates = {} }) {
+  const { t } = useI18n()
   return (
-    <ol aria-label="Report progress" className="flex flex-col">
+    <ol aria-label={t('tracker.progress')} className="flex flex-col">
       {trackerSteps.map((step, index) => {
         const state = stepState(step.id, current)
         const isFixed = step.id === 'fixed'
@@ -116,7 +119,7 @@ export function TrackerVertical({ current, dates = {} }) {
               ) : null}
             </div>
             <div className="pb-3" aria-hidden>
-              <p className={`text-[13px] ${labelClass(state)}`}>{step.label}</p>
+              <p className={`text-[13px] ${labelClass(state)}`}>{t(`tracker.${step.id}`)}</p>
               {dates[step.id] ? (
                 <p className="text-[12px] text-brown-600">{dates[step.id]}</p>
               ) : null}

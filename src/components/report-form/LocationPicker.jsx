@@ -1,15 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MapPinIcon } from '@/components/feed/icons'
+import { LocationPicker as MapPicker } from '@/components/map/CivicMap'
 import { copy } from './formConfig'
-import { MapThumb } from './MapThumb'
 import { reverseToBlock, searchPlaces } from './reportFormService'
+
+const round = (value) => Math.round(value * 1000) / 1000
 
 /**
  * Location, block level only.
  *
- * The device fix is rounded to three decimals, used for the block lookup, then
- * handed to the page for the one place the API needs it (the POST). It is never
- * stored in the draft, never shown, never logged.
+ * Three ways in, all of which end with coordinates: the device fix, a typed
+ * street (forward geocode), or tapping the map. The label shown is "road,
+ * locality" from the reverse geocoder — the exact address never reaches the
+ * browser, and the pin is rounded to three decimals like the fix itself.
+ *
+ * The map is the honest one: it shows the block the report will carry.
  */
 export function LocationPicker({ location, onLocation, onCoords, error, announce }) {
   const [status, setStatus] = useState('idle')
@@ -18,29 +23,78 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [active, setActive] = useState(-1)
+  const [coords, setCoords] = useState(null)
+  const reverseTimer = useRef(null)
+
+  useEffect(
+    () => () => {
+      if (reverseTimer.current) clearTimeout(reverseTimer.current)
+    },
+    [],
+  )
+
+  /**
+   * A drafted report keeps its block label but not its coordinates (they are
+   * held in memory only). Without this, such a draft would look complete and
+   * then refuse to post. Look the label back up once and restore the point.
+   */
+  useEffect(() => {
+    if (!location || coords) return undefined
+    let alive = true
+    searchPlaces(location.blockLabel).then((results) => {
+      if (!alive || results.length === 0) return
+      const first = results[0]
+      const next = { lat: first.lat, lng: first.lng }
+      setCoords(next)
+      onCoords(next)
+    })
+    return () => {
+      alive = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location?.blockLabel])
+
+  const remember = (next) => {
+    setCoords(next)
+    onCoords(next)
+  }
+
+  /** Name the block once the pin stops moving; tapping is not a rate-limit race. */
+  const describe = (lat, lng) => {
+    if (reverseTimer.current) clearTimeout(reverseTimer.current)
+    reverseTimer.current = setTimeout(async () => {
+      const block = await reverseToBlock(lat, lng)
+      onLocation(block)
+      announce(`Location set to ${block.blockLabel}`)
+    }, 400)
+  }
+
+  const onPoint = (lat, lng) => {
+    const next = { lat: round(lat), lng: round(lng) }
+    remember(next)
+    setMessage('')
+    describe(next.lat, next.lng)
+  }
 
   const useMyLocation = () => {
     if (!('geolocation' in navigator)) {
       setMode('manual')
-      setMessage('This browser cannot find your location. Enter a street or ZIP code instead.')
+      setMessage('This browser cannot find your location. Type a street, or tap the map.')
       return
     }
     setStatus('locating')
     navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        const lat = Math.round(coords.latitude * 1000) / 1000
-        const lng = Math.round(coords.longitude * 1000) / 1000
-        const block = await reverseToBlock(lat, lng)
-        onLocation(block)
-        onCoords({ lat, lng })
+      ({ coords: fix }) => {
+        const next = { lat: round(fix.latitude), lng: round(fix.longitude) }
+        remember(next)
         setStatus('idle')
-        announce(`Location set to ${block.blockLabel}`)
+        describe(next.lat, next.lng)
       },
       () => {
         setStatus('idle')
         setMode('manual')
         setMessage(
-          "We couldn't get your location. Enter a street or ZIP code instead.",
+          "We couldn't get your location. Type a street, or tap the map to place the pin.",
         )
       },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
@@ -55,32 +109,46 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
   }
 
   const choose = (place) => {
-    onLocation({ ...place, approximate: true })
-    onCoords(null)
+    remember({ lat: place.lat, lng: place.lng })
+    onLocation({ blockLabel: place.blockLabel, locality: place.locality, approximate: true })
     setSuggestions([])
     setMessage('')
     announce(`Location set to ${place.blockLabel}`)
   }
 
+  const reset = () => {
+    onLocation(null)
+    onCoords(null)
+    setCoords(null)
+    setMode('device')
+    setMessage('')
+    setQuery('')
+    setSuggestions([])
+  }
+
   if (location) {
     return (
-      <div className="flex gap-3">
-        <MapThumb className="size-[92px] shrink-0" />
-        <div className="min-w-0">
-          <p className="text-[15px] font-semibold text-brown-900">{location.blockLabel}</p>
-          <p className="mt-1 text-[13px] text-brown-600">{copy.locationHelper}</p>
+      <div className="flex flex-col gap-3">
+        <MapPicker
+          lat={coords?.lat ?? null}
+          lng={coords?.lng ?? null}
+          onChange={onPoint}
+          className="h-[180px] w-full"
+        />
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[15px] font-semibold text-brown-900">{location.blockLabel}</p>
+            <p className="mt-1 text-[13px] text-brown-600">{copy.locationHelper}</p>
+          </div>
           <button
             type="button"
-            onClick={() => {
-              onLocation(null)
-              onCoords(null)
-              setMode('device')
-            }}
-            className="mt-1 h-11 text-[14px] font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
+            onClick={reset}
+            className="h-11 shrink-0 text-[14px] font-semibold text-green-700 underline decoration-coral-500 decoration-2 underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
           >
             {copy.changeLocation}
           </button>
         </div>
+        <p className="text-[12px] text-brown-600">{copy.mapHint}</p>
       </div>
     )
   }
@@ -92,12 +160,20 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
       aria-invalid={error ? 'true' : undefined}
       aria-describedby={error ? 'location-error' : undefined}
     >
+      <MapPicker
+        lat={coords?.lat ?? null}
+        lng={coords?.lng ?? null}
+        onChange={onPoint}
+        className="h-[220px] w-full"
+      />
+      <p className="mt-1.5 text-[12px] text-brown-600">{copy.mapHint}</p>
+
       {mode === 'device' ? (
         <button
           type="button"
           onClick={useMyLocation}
           disabled={status === 'locating'}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 border border-green-700 text-[15px] font-semibold text-green-700 transition-colors duration-[var(--motion-base)] hover:bg-green-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:border-sand-300 disabled:text-brown-600"
+          className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 border border-green-700 text-[15px] font-semibold text-green-700 transition-colors duration-[var(--motion-base)] hover:bg-green-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none disabled:border-sand-300 disabled:text-brown-600"
         >
           <MapPinIcon size={16} />
           {status === 'locating' ? copy.locating : copy.useLocation}
@@ -113,7 +189,7 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
           or type a street
         </button>
       ) : (
-        <div className="relative">
+        <div className="relative mt-3">
           <label htmlFor="manual-location" className="text-[14px] font-semibold text-brown-900">
             {copy.manualLabel}
           </label>
@@ -141,7 +217,7 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
             aria-expanded={suggestions.length > 0}
             aria-controls="place-suggestions"
             aria-autocomplete="list"
-            placeholder="Elm Street or 211015"
+            placeholder={copy.manualPlaceholder}
             className="mt-1.5 h-12 w-full border border-brown-600 bg-cream-50 px-3 text-[16px] text-brown-900 placeholder:text-brown-600 focus-visible:border-2 focus-visible:border-green-700 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
           />
           <p className="mt-1.5 text-[12px] text-brown-600">{copy.manualHint}</p>
@@ -152,7 +228,11 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
               className="mt-1 list-none border border-sand-300 bg-cream-50 p-0"
             >
               {suggestions.map((place, index) => (
-                <li key={place.blockLabel} role="option" aria-selected={index === active}>
+                <li
+                  key={`${place.blockLabel}-${place.lat}-${place.lng}`}
+                  role="option"
+                  aria-selected={index === active}
+                >
                   <button
                     type="button"
                     onClick={() => choose(place)}

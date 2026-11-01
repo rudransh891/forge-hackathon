@@ -1,47 +1,55 @@
-import { fetchFeedPage, submitReport as postReport } from '@/lib/api'
+import {
+  fetchFeedPage,
+  reverseGeocode,
+  searchGeocode,
+  submitReport as postReport,
+} from '@/lib/api'
 import { categories, simulateSuccess } from './formConfig'
 
-const DELAY = 300
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
- * Mock block labels around the pilot area. A real reverse geocoder is not
- * exposed by the API yet; when it is, only this function changes.
+ * Block-level naming for a point, from the backend's Nominatim proxy.
  *
- * TODO: GET /api/geocode/reverse?lat=&lng= -> { blockLabel, locality }
+ * The label is always "road, locality" — the exact address never reaches the
+ * browser, which is what keeps the form's promise that only the block is shown.
+ * A failed lookup still leaves a usable label and the coordinates intact.
  */
-const BLOCKS = [
-  { blockLabel: 'Jhalwa, near the college gate', locality: 'Jhalwa' },
-  { blockLabel: 'Leader Road, between the crossings', locality: 'Chowk' },
-  { blockLabel: 'Kydganj, riverside end', locality: 'Kydganj' },
-  { blockLabel: 'Civil Lines, by the park', locality: 'Civil Lines' },
-  { blockLabel: 'Naini, bridge approach', locality: 'Naini' },
-  { blockLabel: 'Tagore Town, block C', locality: 'Tagore Town' },
-]
-
-const PLACES = [
-  { blockLabel: 'Jhalwa, near the college gate', locality: 'Jhalwa' },
-  { blockLabel: 'Leader Road, between the crossings', locality: 'Chowk' },
-  { blockLabel: 'Kydganj, riverside end', locality: 'Kydganj' },
-  { blockLabel: 'Civil Lines, by the park', locality: 'Civil Lines' },
-  { blockLabel: 'Naini, bridge approach', locality: 'Naini' },
-  { blockLabel: 'Tagore Town, block C', locality: 'Tagore Town' },
-  { blockLabel: 'Allahpur, main road', locality: 'Allahpur' },
-  { blockLabel: 'Salori, by the school', locality: 'Salori' },
-]
-
-/** Block-level text only. Coordinates are used, then discarded. */
 export async function reverseToBlock(lat, lng) {
-  await wait(DELAY)
-  const index = Math.abs(Math.round(lat * 1000) + Math.round(lng * 1000)) % BLOCKS.length
-  return { ...BLOCKS[index], approximate: true }
+  try {
+    const place = await reverseGeocode(lat, lng)
+    return {
+      blockLabel: place.blockLabel,
+      locality: place.locality || 'Prayagraj',
+      approximate: true,
+      lat: place.lat,
+      lng: place.lng,
+    }
+  } catch {
+    return {
+      blockLabel: 'Reported location',
+      locality: 'Prayagraj',
+      approximate: true,
+      lat,
+      lng,
+    }
+  }
 }
 
+/** Forward geocode for the "type a street" path. Coordinates included. */
 export async function searchPlaces(query) {
-  const value = String(query || '').trim().toLowerCase()
-  if (value.length < 2) return []
-  await wait(DELAY)
-  return PLACES.filter((place) => place.blockLabel.toLowerCase().includes(value)).slice(0, 5)
+  const value = String(query || '').trim()
+  if (value.length < 3) return []
+  try {
+    const places = await searchGeocode(value)
+    return places.map((place) => ({
+      ...place,
+      locality: place.locality || 'Prayagraj',
+      approximate: true,
+    }))
+  } catch {
+    return []
+  }
 }
 
 const STOP = new Set(['the', 'and', 'with', 'from', 'near', 'this', 'that'])
@@ -87,7 +95,7 @@ export async function submitReport(payload) {
     await wait(600)
     return { status: 'ok', id: 'demo' }
   }
-  const { photos, coords, title, description, blockLabel, locality, safetyHazard, idToken } =
+  const { photos, coords, title, description, blockLabel, locality, safetyHazard, category, audioText, idToken } =
     payload
 
   if (!coords) return { status: 'manual_location' }
@@ -103,10 +111,12 @@ export async function submitReport(payload) {
 
   try {
     const receipt = await postReport({
-      photo: photos[0].blob,
+      photos: photos.map((photo) => photo.blob),
       lat: coords.lat,
       lng: coords.lng,
       description: detail,
+      category,
+      audioText,
       idToken,
     })
     return { status: 'ok', id: receipt.id }

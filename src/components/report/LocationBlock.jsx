@@ -1,38 +1,16 @@
 import { MapPinIcon } from '@/components/feed/icons'
-
-function MapThumb() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 280 160"
-      className="h-auto w-full border border-sand-300 bg-sand-100"
-    >
-      <rect width="280" height="160" fill="var(--color-sand-100)" />
-      <g fill="var(--color-cream-50)">
-        <rect x="12" y="12" width="70" height="48" />
-        <rect x="102" y="12" width="76" height="48" />
-        <rect x="198" y="12" width="70" height="48" />
-        <rect x="12" y="80" width="70" height="68" />
-        <rect x="198" y="80" width="70" height="68" />
-      </g>
-      <g stroke="var(--color-sand-300)" strokeWidth="8">
-        <path d="M0 70h280" />
-        <path d="M92 0v160" />
-        <path d="M186 0v160" />
-      </g>
-      <rect x="126" y="88" width="34" height="34" fill="var(--color-coral-500)" />
-      <rect x="136" y="98" width="14" height="14" fill="var(--color-cream-50)" />
-    </svg>
-  )
-}
+import { CivicMap } from '@/components/map/CivicMap'
 
 /**
- * Address line + Map link, with an optional decorative map for the rail.
+ * Address line + Map link, with the report's real location on a Leaflet map
+ * where the caller has coordinates.
  *
- * The link opens OpenStreetMap at the report's coordinates. Before the merge it
- * was `href="#"` with preventDefault, so the affordance did nothing.
+ * The link opens OpenStreetMap at the same point in a new tab; the embedded map
+ * is a read-only view so it cannot steal scroll from the page.
  */
-export function LocationBlock({ addressBlock, withMap = false, mapHref, coords }) {
+export function LocationBlock({ addressBlock, withMap = false, mapHref, coords, lat, lng }) {
+  const hasPoint = typeof lat === 'number' && typeof lng === 'number'
+
   return (
     <section aria-label="Location">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -50,13 +28,16 @@ export function LocationBlock({ addressBlock, withMap = false, mapHref, coords }
         </a>
       </div>
 
-      {coords ? (
-        <p className="mt-1 font-mono text-[12px] text-brown-600">{coords}</p>
-      ) : null}
+      {coords ? <p className="mt-1 font-mono text-[12px] text-brown-600">{coords}</p> : null}
 
-      {withMap ? (
-        <div className="mt-3 hidden lg:block">
-          <MapThumb />
+      {withMap && hasPoint ? (
+        <div className="mt-3">
+          <CivicMap
+            lat={lat}
+            lng={lng}
+            label={`Map showing the reported location at ${addressBlock}`}
+            className="h-[180px] w-full"
+          />
         </div>
       ) : null}
     </section>

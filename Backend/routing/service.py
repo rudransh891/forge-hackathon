@@ -1,4 +1,4 @@
-﻿"""Route one report: pilot-area check, complaint, delivery, honest record. Never raises."""
+"""Route one report: pilot-area check, complaint, delivery, honest record. Never raises."""
 import json
 
 from sqlalchemy import text
@@ -15,9 +15,10 @@ SKIP_STATUSES = {"received", "needs_review", "needs_better_photo", "merged"}
 def _save(report_id, status, record, note, set_routed=False):
     with engine.begin() as c:
         c.execute(text(
-            "UPDATE reports SET ai_result = COALESCE(ai_result, '{}'::jsonb) "
+            "UPDATE reports SET department = COALESCE(:dept, department), "
+            "ai_result = COALESCE(ai_result, '{}'::jsonb) "
             "|| jsonb_build_object('routing', CAST(:rec AS jsonb)) WHERE id = :i"
-        ), {"rec": json.dumps(record), "i": report_id})
+        ), {"rec": json.dumps(record), "dept": record.get("body"), "i": report_id})
         if set_routed:
             c.execute(text("UPDATE reports SET status = 'routed' WHERE id = :i AND status = 'analysed'"),
                       {"i": report_id})

@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 import { useAuthModal } from '@/components/auth/AuthModalProvider'
-import { pilotCity } from '@/components/feed/feedConfig'
+import { useI18n } from '@/lib/i18n'
 
 export function ClosingCta() {
   const { openAuthModal } = useAuthModal()
+  const { t } = useI18n()
 
   return (
     <section
@@ -19,20 +20,18 @@ export function ClosingCta() {
           numberClassName="text-coral-300"
           dividerClassName="bg-sand-300"
         >
-          Closing call
+          {t('cta.marker')}
         </SectionMarker>
 
         <h2
           id="cta-title"
           className="mx-auto mt-5 max-w-[16ch] text-[34px] leading-[1.05] font-light text-cream-100 md:text-[60px] md:leading-[64px]"
         >
-          Join {pilotCity}’s <span className="text-coral-300">conversation</span>
+          {t('cta.title')} <span className="text-coral-300">{t('cta.titleAccent')}</span>
         </h2>
 
         <p className="mx-auto mt-5 max-w-[58ch] text-on-panel-muted">
-          A non-partisan pilot built on OpenStreetMap, Open-Meteo and an open vision model.
-          Every report shows the evidence behind its score, and nothing claims a department
-          acted when it did not.
+          {t('cta.body')}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -41,13 +40,13 @@ export function ClosingCta() {
             onClick={() => openAuthModal('signup')}
             className="h-12 bg-coral-300 px-6 text-[15px] font-semibold text-brown-900 hover:bg-cream-100 hover:text-brown-900"
           >
-            Create free account
+            {t('cta.signup')}
           </Button>
           <Button
             variant="outline"
             className="h-12 border border-sand-300 bg-transparent px-6 text-[15px] font-semibold text-cream-100 hover:border-coral-300 hover:bg-transparent hover:text-cream-100"
           >
-            Learn more
+            {t('cta.learn')}
           </Button>
         </div>
       </Container>

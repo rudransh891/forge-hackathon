@@ -14,7 +14,7 @@ import { labels } from '@/components/feed/feedConfig'
  * answers `not_configured` because the backend has no comments table. The
  * notice says so rather than pretending the comment was saved.
  */
-export function CommentComposer({ reportId, onRequireAuth }) {
+export function CommentComposer({ reportId, onRequireAuth, onPosted }) {
   const { account } = useAuth()
   const [text, setText] = useState('')
   const [notice, setNotice] = useState('')
@@ -30,10 +30,19 @@ export function CommentComposer({ reportId, onRequireAuth }) {
     const body = text.trim()
     if (!body || pending) return
     setPending(true)
-    await postComment({ reportId, text: body, idToken: await getIdToken() })
+    const result = await postComment({
+      reportId,
+      text: body,
+      idToken: await getIdToken(),
+    })
     setPending(false)
-    setText('')
-    setNotice(labels.commentsNotConnected)
+    if (result.status === 'ok') {
+      setText('')
+      setNotice('Posted.')
+      onPosted?.()
+      return
+    }
+    setNotice(result.message || labels.commentsNotConnected)
   }
 
   if (!account) {

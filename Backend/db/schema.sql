@@ -21,8 +21,20 @@ CREATE TABLE IF NOT EXISTS reports (
     ai_result       JSONB,
     context         JSONB,
     account_uid     TEXT,
-    account_email   TEXT
+    account_email   TEXT,
+    citizen_category TEXT,
+    resolved_at     TIMESTAMPTZ
 );
+
+CREATE TABLE IF NOT EXISTS report_photos (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    report_id   UUID NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+    path        TEXT NOT NULL,
+    ordinal     INT NOT NULL DEFAULT 0,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_report_photos_report ON report_photos(report_id);
 
 CREATE TABLE IF NOT EXISTS status_events (
     id          BIGSERIAL PRIMARY KEY,

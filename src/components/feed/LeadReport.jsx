@@ -1,6 +1,7 @@
 import { feedNavigation } from '@/components/report/feedNavigation'
 import { supportCount } from '@/components/report/reportStore'
 import { CommentIcon } from './icons'
+import { useI18n } from '@/lib/i18n'
 import { ReportPhoto } from './ReportPhoto'
 import { StatusTag, VerificationMark } from './StatusTag'
 import { SupportButton } from './SupportButton'
@@ -10,6 +11,7 @@ import { SupportButton } from './SupportButton'
  * headline. Photo left / text right on desktop, stacked on mobile.
  */
 export function LeadReport({ report, supported, onSupport }) {
+  const { t } = useI18n()
   const headlineId = `lead-${report.id}`
 
   return (
@@ -64,10 +66,10 @@ export function LeadReport({ report, supported, onSupport }) {
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 lg:mt-auto">
             <p className="flex items-center gap-3 text-[12px] text-on-panel-muted">
-              <span>{supportCount(report.id, report.supporters)} supporters</span>
+              <span>{supportCount(report.id, report.supporters)} {t('feed.supporters')}</span>
               <span className="inline-flex items-center gap-1">
                 <CommentIcon size={13} className="text-coral-300" />
-                {report.comments} comments
+                {report.comments} {t('feed.comments')}
               </span>
             </p>
             <SupportButton

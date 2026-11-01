@@ -1,5 +1,5 @@
 import { AlertIcon, CheckIcon, InfoIcon } from './icons'
-import { labels } from './feedConfig'
+import { useI18n } from '@/lib/i18n'
 
 /**
  * Status tags. Urgent is the only thing on the page allowed to combine the
@@ -10,11 +10,12 @@ import { labels } from './feedConfig'
  * failed report never looks like a healthy open one.
  */
 export function StatusTag({ status, urgent }) {
+  const { t } = useI18n()
   if (urgent) {
     return (
       <span className="inline-flex h-6 items-center gap-1.5 bg-coral-700 px-2 text-[12px] font-semibold text-cream-50">
         <AlertIcon size={14} />
-        Urgent
+        {t('status.urgent')}
       </span>
     )
   }
@@ -22,14 +23,14 @@ export function StatusTag({ status, urgent }) {
     return (
       <span className="inline-flex h-6 items-center gap-1.5 bg-green-100 px-2 text-[12px] font-semibold text-green-700">
         <CheckIcon size={14} />
-        Resolved
+        {t('status.resolved')}
       </span>
     )
   }
   if (status === 'merged') {
     return (
       <span className="inline-flex h-6 items-center gap-1.5 bg-sand-100 px-2 text-[12px] font-semibold text-brown-900">
-        Duplicate
+        {t('status.duplicate')}
       </span>
     )
   }
@@ -37,7 +38,7 @@ export function StatusTag({ status, urgent }) {
     return (
       <span className="inline-flex h-6 items-center gap-1.5 bg-coral-100 px-2 text-[12px] font-semibold text-coral-700">
         <InfoIcon size={14} />
-        Needs a clear photo
+        {t('status.needsPhoto')}
       </span>
     )
   }
@@ -45,7 +46,7 @@ export function StatusTag({ status, urgent }) {
     return (
       <span className="inline-flex h-6 items-center gap-1.5 bg-teal-100 px-2 text-[12px] font-semibold text-brown-900">
         <InfoIcon size={14} />
-        Under review
+        {t('status.underReview')}
       </span>
     )
   }
@@ -62,13 +63,14 @@ export function UpdateNote({ update }) {
 }
 
 export function VerificationMark({ verification, short = false }) {
+  const { t } = useI18n()
   if (verification === 'verified') {
     return (
       <span className="inline-flex items-center gap-1 text-green-700">
         <CheckIcon size={12} />
-        {short ? 'Verified' : labels.verified}
+        {short ? t('status.verified') : t('status.verified')}
       </span>
     )
   }
-  return <span>{labels.unverified}</span>
+  return <span>{t('status.unverified')}</span>
 }

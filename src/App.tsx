@@ -11,6 +11,7 @@ import { SiteFooter } from '@/components/site/site-footer'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { AuthModalProvider } from '@/components/auth/AuthModalProvider'
 import { AuthProvider } from '@/components/auth/AuthProvider'
+import { I18nProvider } from '@/lib/i18n'
 import { FeedPage } from '@/components/feed/FeedPage'
 import { ReportPage } from '@/components/report/ReportPage'
 import { ReportFormPage } from '@/components/report-form/ReportFormPage'
@@ -45,8 +46,9 @@ function App() {
   const showSubmit = hash === '#/submit' || hash === '#/report/new'
 
   return (
-    <AuthProvider>
-      <AuthModalProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <AuthModalProvider>
       {/* Newsprint texture, below every other element. Sections that sit on the
           cream page are transparent so this shows through; brown panels stay opaque. */}
       <div
@@ -83,8 +85,9 @@ function App() {
       <SiteFooter />
 
       <AuthModal />
-      </AuthModalProvider>
-    </AuthProvider>
+        </AuthModalProvider>
+      </AuthProvider>
+    </I18nProvider>
   )
 }
 
