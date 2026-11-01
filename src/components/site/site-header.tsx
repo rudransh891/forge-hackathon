@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/site/layout'
 import { useAuth } from '@/components/auth/AuthProvider'
@@ -18,15 +19,16 @@ export function SiteHeader() {
   const { openAuthModal } = useAuthModal()
   const { account, signOut } = useAuth()
   const { lang, setLang, t } = useI18n()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-40 border-b border-sand-300 bg-cream-100/90 backdrop-blur">
-      <Container className="flex h-16 items-center justify-between gap-6">
-        <a href="#top" className="flex items-baseline gap-1.5">
-          <span className="font-display text-[22px] leading-none tracking-tight text-brown-900">
+      <Container className="flex h-16 items-center justify-between gap-3">
+        <a href="#top" className="flex min-w-0 items-baseline gap-1.5">
+          <span className="truncate font-display text-[20px] leading-none tracking-tight text-brown-900 md:text-[22px]">
             FixItBharat
           </span>
-          <span aria-hidden className="size-1.5 bg-coral-500" />
+          <span aria-hidden className="size-1.5 shrink-0 bg-coral-500" />
         </a>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
@@ -82,7 +84,7 @@ export function SiteHeader() {
                 type="button"
                 variant="outline"
                 onClick={() => signOut()}
-                className="h-11 border border-brown-600 bg-transparent px-3 text-sm font-semibold text-brown-900"
+                className="h-11 border border-brown-600 bg-transparent px-3 text-[13px] font-semibold text-brown-900 md:text-sm"
               >
                 {t('auth.logout')}
               </Button>
@@ -91,13 +93,47 @@ export function SiteHeader() {
             <Button
               type="button"
               onClick={() => openAuthModal('login')}
-              className="h-11 bg-green-700 px-4 text-sm font-semibold text-cream-50"
+              className="h-11 bg-green-700 px-3 text-[13px] font-semibold text-cream-50 md:px-4 md:text-sm"
             >
-              {t('auth.login')}
+              <span className="md:hidden">{t('auth.loginShort')}</span>
+              <span className="hidden md:inline">{t('auth.login')}</span>
             </Button>
           )}
+
+          {/* Below md the links would not fit in the bar, so they live behind this
+              toggle instead of disappearing. */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((current) => !current)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            className="h-11 border border-brown-600 px-3 text-[13px] font-semibold text-brown-900 md:hidden"
+          >
+            {menuOpen ? t('nav.close') : t('nav.menu')}
+          </button>
         </div>
       </Container>
+
+      {menuOpen ? (
+        <nav
+          id="mobile-nav"
+          aria-label="Primary"
+          className="border-t border-sand-300 bg-cream-100 md:hidden"
+        >
+          <Container className="flex flex-col py-1">
+            {LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="border-b border-sand-300 py-3 text-[15px] font-medium text-brown-900 last:border-b-0"
+              >
+                {t(link.key)}
+              </a>
+            ))}
+          </Container>
+        </nav>
+      ) : null}
     </header>
   )
 }
