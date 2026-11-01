@@ -3,7 +3,7 @@ import os
 import uuid
 from pathlib import Path
 
-from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, ImageOps, UnidentifiedImageError
@@ -15,6 +15,8 @@ from jobs.process import process_report
 from api.database import engine
 from contextlib import asynccontextmanager
 from jobs.scheduler import start_scheduler
+from api.identity import configured as identity_configured
+from api.identity import verify_id_token
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -79,9 +81,24 @@ async def create_report(
     lat: float = Form(...),
     lng: float = Form(...),
     description: str = Form(""),
+    authorization: str | None = Header(default=None),
 ):
     if not (-90 <= lat <= 90 and -180 <= lng <= 180):
         raise HTTPException(status_code=422, detail="Location is outside valid range.")
+
+    # Reports are open to anyone. If the request carries a Firebase ID token and
+    # this backend knows how to check one, the report is attributed to that
+    # account; a bad token is refused rather than silently ignored.
+    reporter = None
+    if authorization and identity_configured():
+        scheme, _, token = authorization.partition(" ")
+        if scheme.lower() == "bearer" and token.strip():
+            reporter = verify_id_token(token.strip())
+            if reporter is None:
+                raise HTTPException(
+                    status_code=401,
+                    detail="That sign-in token is not valid or has expired.",
+                )
 
     data = await photo.read()
     if not data:
@@ -103,10 +120,18 @@ async def create_report(
     with engine.begin() as conn:
         report_id = conn.execute(
             text(
-                "insert into reports (photo_path, description, lat, lng) "
-                "values (:p, :d, :lat, :lng) returning id"
+                "insert into reports (photo_path, description, lat, lng, "
+                "account_uid, account_email) "
+                "values (:p, :d, :lat, :lng, :uid, :email) returning id"
             ),
-            {"p": filename, "d": description.strip(), "lat": lat, "lng": lng},
+            {
+                "p": filename,
+                "d": description.strip(),
+                "lat": lat,
+                "lng": lng,
+                "uid": reporter["uid"] if reporter else None,
+                "email": reporter["email"] if reporter else None,
+            },
         ).scalar()
         conn.execute(
             text(

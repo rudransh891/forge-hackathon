@@ -84,7 +84,7 @@ export function CommentsSection({ reportId, commentCount, onRequireAuth }) {
         </label>
       </div>
 
-      <CommentComposer onRequireAuth={onRequireAuth} />
+      <CommentComposer reportId={reportId} onRequireAuth={onRequireAuth} />
 
       <p aria-live="polite" className="sr-only">
         {announcement}

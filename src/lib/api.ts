@@ -167,10 +167,11 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (init.body && !(init.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json'
   }
+  const merged = { ...headers, ...((init.headers as Record<string, string> | undefined) ?? {}) }
 
   let response: Response
   try {
-    response = await fetch(`${API_BASE}${path}`, { ...init, headers })
+    response = await fetch(`${API_BASE}${path}`, { ...init, headers: merged })
   } catch {
     throw new ApiError(0, 'The server is not reachable.')
   }
@@ -536,18 +537,24 @@ export async function submitReport({
   lat,
   lng,
   description,
+  idToken,
 }: {
   photo: File
   lat: number
   lng: number
   description: string
+  idToken?: string | null
 }): Promise<SubmitReceipt> {
   const form = new FormData()
   form.append('photo', photo)
   form.append('lat', String(lat))
   form.append('lng', String(lng))
   form.append('description', description)
-  return apiFetch<SubmitReceipt>('/reports', { method: 'POST', body: form })
+  return apiFetch<SubmitReceipt>('/reports', {
+    method: 'POST',
+    body: form,
+    headers: idToken ? { Authorization: `Bearer ${idToken}` } : undefined,
+  })
 }
 
 /** The maximum the API accepts, mirrored here so the client can fail fast. */

@@ -5,13 +5,14 @@ import { TextField } from '../fields/TextField'
 import { PasswordField } from '../fields/PasswordField'
 import { CheckboxField } from '../fields/CheckboxField'
 import { validateIdentifier, validatePassword } from '../authValidation'
-import { login } from '../authService'
+import { login, loginWithGoogle } from '../authService'
+import { NOT_CONFIGURED_MESSAGE, firebaseConfigured } from '@/lib/firebase'
 import { AlertIcon, CheckIcon, InfoIcon } from '../icons'
 
 const copy = views.login
 
 export function LoginForm() {
-  const { openAuthModal } = useAuthModal()
+  const { openAuthModal, closeAuthModal } = useAuthModal()
   const [form, setForm] = useState({ identifier: '', password: '', keepLoggedIn: false })
   const [errors, setErrors] = useState({})
   const [banner, setBanner] = useState(null)
@@ -37,6 +38,7 @@ export function LoginForm() {
       document.getElementById(`login-${firstInvalid}`)?.focus()
       return
     }
+
     setPending(true)
     const result = await login({
       identifier: form.identifier.trim(),
@@ -44,12 +46,23 @@ export function LoginForm() {
       keepLoggedIn: form.keepLoggedIn,
     })
     setPending(false)
-    if (result.status === 'not_configured') {
-      setBanner({
-        kind: 'info',
-        text: "Authentication isn't connected yet. Your details were not sent anywhere.",
-      })
+
+    if (result.status === 'ok') {
+      closeAuthModal()
+      return
     }
+    setBanner({ kind: 'error', text: result.message })
+  }
+
+  const onGoogle = async () => {
+    setPending(true)
+    const result = await loginWithGoogle()
+    setPending(false)
+    if (result.status === 'ok') {
+      closeAuthModal()
+      return
+    }
+    setBanner({ kind: 'error', text: result.message })
   }
 
   return (
@@ -86,12 +99,18 @@ export function LoginForm() {
             <span>{banner.text}</span>
           </p>
         ) : null}
+        {!firebaseConfigured ? (
+          <p className="mt-4 flex items-start gap-2 bg-teal-100 px-3 py-2.5 text-sm text-brown-900">
+            <InfoIcon size={16} />
+            <span>{NOT_CONFIGURED_MESSAGE}</span>
+          </p>
+        ) : null}
       </div>
 
       <form className="mt-5 flex flex-col gap-4" onSubmit={onSubmit} noValidate>
         <TextField
           id="login-identifier"
-          label="Email or phone"
+          label="Email"
           type="text"
           inputMode="email"
           autoComplete="username"
@@ -133,7 +152,7 @@ export function LoginForm() {
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || !firebaseConfigured}
           className="h-12 w-full bg-green-700 text-[15px] font-semibold text-cream-50 transition-colors hover:bg-brown-900 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-300 disabled:text-brown-600"
         >
           {pending ? 'Please wait...' : 'Log in'}
@@ -151,14 +170,14 @@ export function LoginForm() {
             <button
               key={method.id}
               type="button"
-              disabled={!method.enabled}
-              onClick={() => method.onSelect?.()}
+              disabled={!method.enabled || !firebaseConfigured || pending}
+              onClick={() => (method.id === 'google' ? onGoogle() : method.onSelect?.())}
               className="flex h-12 w-full items-center justify-center gap-2 border border-brown-600 bg-transparent text-sm font-semibold text-brown-900 transition-colors hover:bg-sand-100 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:bg-sand-100 disabled:text-brown-600"
             >
               {method.label}
-              {method.enabled ? null : (
+              {method.enabled && firebaseConfigured ? null : (
                 <span className=" bg-teal-100 px-1.5 py-0.5 text-xs font-semibold text-brown-900">
-                  Coming soon
+                  {firebaseConfigured ? 'Coming soon' : 'Not configured'}
                 </span>
               )}
             </button>

@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS reports (
     confirmations   INTEGER NOT NULL DEFAULT 1,
     deadline_at     TIMESTAMPTZ,
     ai_result       JSONB,
-    context         JSONB
+    context         JSONB,
+    account_uid     TEXT,
+    account_email   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS status_events (

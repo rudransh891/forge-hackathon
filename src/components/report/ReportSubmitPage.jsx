@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MAX_UPLOAD_BYTES, submitReport } from '@/lib/api'
+import { getIdToken } from '@/components/auth/authService'
+import { useAuth } from '@/components/auth/AuthProvider'
 
 /**
  * Report writing, deliberately bare: no design system, plain form controls.
@@ -9,6 +11,7 @@ import { MAX_UPLOAD_BYTES, submitReport } from '@/lib/api'
  * state links to the report instead of showing a finished one.
  */
 export function ReportSubmitPage() {
+  const { account } = useAuth()
   const [photo, setPhoto] = useState(null)
   const [preview, setPreview] = useState(null)
   const [description, setDescription] = useState('')
@@ -102,7 +105,16 @@ export function ReportSubmitPage() {
 
     setSubmitting(true)
     try {
-      const receipt = await submitReport({ photo, lat: latitude, lng: longitude, description })
+      // Signed in or not, a report can be filed. Signed in, the backend records
+      // who filed it after verifying the Firebase token.
+      const idToken = account ? await getIdToken() : null
+      const receipt = await submitReport({
+        photo,
+        lat: latitude,
+        lng: longitude,
+        description,
+        idToken,
+      })
       setCreatedId(receipt.id)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'The report could not be sent.')

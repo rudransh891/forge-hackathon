@@ -10,6 +10,7 @@ import { ClosingCta } from '@/components/site/closing-cta'
 import { SiteFooter } from '@/components/site/site-footer'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { AuthModalProvider } from '@/components/auth/AuthModalProvider'
+import { AuthProvider } from '@/components/auth/AuthProvider'
 import { FeedPage } from '@/components/feed/FeedPage'
 import { ReportPage } from '@/components/report/ReportPage'
 import { ReportSubmitPage } from '@/components/report/ReportSubmitPage'
@@ -44,7 +45,8 @@ function App() {
   const showSubmit = hash === '#/submit'
 
   return (
-    <AuthModalProvider>
+    <AuthProvider>
+      <AuthModalProvider>
       {/* Newsprint texture, below every other element. Sections that sit on the
           cream page are transparent so this shows through; brown panels stay opaque. */}
       <div
@@ -81,7 +83,8 @@ function App() {
       <SiteFooter />
 
       <AuthModal />
-    </AuthModalProvider>
+      </AuthModalProvider>
+    </AuthProvider>
   )
 }
 

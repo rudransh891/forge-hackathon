@@ -28,12 +28,18 @@ export function ForgotForm() {
       document.getElementById('forgot-identifier')?.focus()
       return
     }
+
     setPending(true)
-    await requestReset({ identifier: identifier.trim() })
+    const result = await requestReset({ identifier: identifier.trim() })
     setPending(false)
+
+    if (result.status === 'error') {
+      setError(result.message)
+      return
+    }
     setBanner({
       kind: 'info',
-      text: 'If an account exists for that email or phone, a reset link is on its way. Authentication is not connected yet, so nothing was sent.',
+      text: 'If an account exists for that email, a reset link is on its way.',
     })
   }
 
@@ -62,7 +68,7 @@ export function ForgotForm() {
       <form className="mt-5 flex flex-col gap-4" onSubmit={onSubmit} noValidate>
         <TextField
           id="forgot-identifier"
-          label="Email or phone"
+          label="Email"
           type="text"
           inputMode="email"
           autoComplete="username"

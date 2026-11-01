@@ -7,6 +7,12 @@ schema and API that would make it real, what it depends on, and a size.
 Read with `BACKEND-NOT-INVOKED.md`: that file lists the reverse — backend
 capability the UI still does not use.
 
+> **Status:** §1 (accounts) is now done with Firebase Auth, not built from
+> scratch — the modal's four views call the Firebase SDK directly and the backend
+> verifies ID tokens to attribute reports to an account. The §1 text below is the
+> from-scratch plan, kept because §2, §3, §4 and §10 all still depend on knowing
+> who a citizen is. §13's Google-sign-in row is also done.
+
 Sizes are relative: **S** = under a day, **M** = a few days, **L** = a week plus
 design work.
 
@@ -468,7 +474,7 @@ backend or a copy change:
 |---|---|---|---|
 | "Terms" / "Privacy Policy" links | `SignupForm.jsx` | `href="#"`, `preventDefault` | static pages, no backend |
 | "Learn more" in the closing CTA | `closing-cta.tsx` | no handler | a link target |
-| Google sign-in | `authModalConfig.methods` | `enabled: false`, "Coming soon" | OAuth, §1 |
+| Google sign-in | `authModalConfig.methods` | enabled, Firebase popup | done |
 | "Send me ward updates" checkbox | `SignupForm.jsx` | collected, never sent | `accounts.ward_updates`, §1 |
 | Share on mobile | `ShareButton.jsx` | works, but shares a hash URL | nothing — fine as is |
 
