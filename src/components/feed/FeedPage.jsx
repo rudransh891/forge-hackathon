@@ -73,7 +73,7 @@ export function FeedPage() {
 
   // Reporting needs a photo and coordinates, not an account: it has its own page.
   const openReport = () => {
-    window.location.hash = '#/submit'
+    window.location.hash = '#/report/new'
   }
 
   return (

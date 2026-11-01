@@ -13,7 +13,7 @@ import { AuthModalProvider } from '@/components/auth/AuthModalProvider'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { FeedPage } from '@/components/feed/FeedPage'
 import { ReportPage } from '@/components/report/ReportPage'
-import { ReportSubmitPage } from '@/components/report/ReportSubmitPage'
+import { ReportFormPage } from '@/components/report-form/ReportFormPage'
 import { feedNavigation } from '@/components/report/feedNavigation'
 
 /**
@@ -42,7 +42,7 @@ function App() {
   const reportMatch = hash.match(/^#\/issues\/([^/]+)$/)
   const reportId = reportMatch ? reportMatch[1] : null
   const showFeed = hash === '#/issues'
-  const showSubmit = hash === '#/submit'
+  const showSubmit = hash === '#/submit' || hash === '#/report/new'
 
   return (
     <AuthProvider>
@@ -67,7 +67,7 @@ function App() {
       ) : showFeed ? (
         <FeedPage />
       ) : showSubmit ? (
-        <ReportSubmitPage />
+        <ReportFormPage />
       ) : (
         <main id="top">
           <Hero />
