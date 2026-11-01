@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { copy } from './formConfig'
+import { useCopy } from './formConfig'
 
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
 
@@ -9,6 +9,7 @@ const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1
  * the auth modal, with Keep editing focused by default.
  */
 export function LeaveDialog({ onKeepEditing, onSaveAndLeave, onDiscard }) {
+  const copy = useCopy()
   const dialogRef = useRef(null)
   const keepRef = useRef(null)
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPinIcon } from '@/components/feed/icons'
 import { LocationPicker as MapPicker } from '@/components/map/CivicMap'
-import { copy } from './formConfig'
+import { useCopy } from './formConfig'
 import { reverseToBlock, searchPlaces } from './reportFormService'
 
 const round = (value) => Math.round(value * 1000) / 1000
@@ -17,6 +17,7 @@ const round = (value) => Math.round(value * 1000) / 1000
  * The map is the honest one: it shows the block the report will carry.
  */
 export function LocationPicker({ location, onLocation, onCoords, error, announce }) {
+  const copy = useCopy()
   const [status, setStatus] = useState('idle')
   const [mode, setMode] = useState('device')
   const [message, setMessage] = useState('')

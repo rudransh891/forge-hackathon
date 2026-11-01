@@ -150,7 +150,7 @@ const STRINGS = {
     'feed.open': 'open',
     'feed.fixed': 'fixed',
 
-    'status.urgent': 'Urgent',
+    'tracker.seen': 'Routed',
     'status.resolved': 'Resolved',
     'status.acknowledged': 'Acknowledged',
     'status.inProgress': 'In progress',
@@ -402,7 +402,7 @@ const STRINGS = {
     'poll.vote': 'मत',
     'poll.votes': 'मत',
     'poll.footnote':
-      'हर पट्टी के आगे प्रतिशत लिखा है, इसलिए परिणाम केवल रंग पर निर्भर नहीं। सर्वर पर कुछ संग्रह नहीं होता, और मतदान जुड़ने तक कोई अंतिम तिथि नहीं।',
+      'हर पट्टी के आगे प्रतिशत लिखा है, इसलिए परिणाम केवल रंग पर निर्भर नहीं। प्रति ब्राउज़र एक मत, और हर गिनती डेटाबेस से पढ़ी जाती है।',
 
     'faq.marker': 'सामान्य प्रश्न',
     'faq.title': 'लोग जो पूछते हैं',
@@ -455,7 +455,7 @@ const STRINGS = {
     'feed.open': 'खुली',
     'feed.fixed': 'ठीक हुईं',
 
-    'status.urgent': 'अत्यावश्यक',
+    'tracker.seen': 'भेजा गया',
     'status.resolved': 'हल हुई',
     'status.acknowledged': 'स्वीकार किया',
     'status.inProgress': 'कार्य जारी',

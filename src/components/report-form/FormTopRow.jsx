@@ -1,8 +1,9 @@
 import { CheckIcon } from '@/components/feed/icons'
-import { copy } from './formConfig'
+import { useCopy } from './formConfig'
 
 /** Cancel on the left, the draft's state on the right. */
 export function FormTopRow({ onCancel, saved }) {
+  const copy = useCopy()
   return (
     <div className="flex h-11 items-center justify-between">
       <button

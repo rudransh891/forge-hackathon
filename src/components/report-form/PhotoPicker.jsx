@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { copy, maxFileMB, maxPhotos } from './formConfig'
+import { maxFileMB, maxPhotos, useCopy } from './formConfig'
 import { processFiles } from './imageUtils'
 
 function CameraIcon() {
@@ -15,6 +15,7 @@ function CameraIcon() {
  * enhancement, thumbnails with 44px remove targets.
  */
 export function PhotoPicker({ photos, errors, onAdd, onRemove, onReject, announce }) {
+  const copy = useCopy()
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
 

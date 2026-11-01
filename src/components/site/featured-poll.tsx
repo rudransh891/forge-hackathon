@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Container, SectionMarker } from '@/components/site/layout'
 import { castVote, fetchActivePoll } from '@/lib/api'
-import type { ActivePoll } from '@/lib/api'
+import type { ActivePoll, PollOption } from '@/lib/api'
 import { useI18n } from '@/lib/i18n'
 
 /** A stable per-browser key so one browser gets one vote. Not an identity. */
@@ -27,7 +27,12 @@ function voterKey(): string {
  * bars are counted from those rows, so the numbers are real.
  */
 export function FeaturedPoll() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  const hi = lang === 'hi'
+
+  /** The question and options are rows, so their Hindi lives beside them. */
+  const optionLabel = (option: PollOption) =>
+    hi && option.label_hi ? option.label_hi : option.label
   const [poll, setPoll] = useState<ActivePoll | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [voted, setVoted] = useState(false)
@@ -87,7 +92,11 @@ export function FeaturedPoll() {
             id="poll-title"
             className="mt-4 max-w-[24ch] text-[28px] leading-[1.15] text-brown-900 md:text-[34px] md:leading-[40px]"
           >
-            {poll ? poll.question : t('poll.title')}{' '}
+            {poll
+              ? hi && poll.question_hi
+                ? poll.question_hi
+                : poll.question
+              : t('poll.title')}{' '}
             {poll ? null : (
               <span className="text-coral-500">{t('poll.titleAccent')}</span>
             )}
@@ -126,7 +135,7 @@ export function FeaturedPoll() {
                     >
                       {isSelected ? <span className="size-2.5 bg-coral-500" /> : null}
                     </span>
-                    <span>{option.label}</span>
+                    <span>{optionLabel(option)}</span>
                   </label>
                 )
               })}
@@ -166,7 +175,7 @@ export function FeaturedPoll() {
               return (
                 <li key={option.id}>
                   <div className="flex items-baseline justify-between gap-4 text-sm">
-                    <span className="text-cream-100">{option.label}</span>
+                    <span className="text-cream-100">{optionLabel(option)}</span>
                     <span className="font-mono text-cream-100">{pct(option.votes)}%</span>
                   </div>
                   <div className="mt-2 h-2.5 bg-brown-700">

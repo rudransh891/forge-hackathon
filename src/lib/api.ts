@@ -815,10 +815,16 @@ export async function fetchDepartments(): Promise<DepartmentRow[]> {
   return data.items
 }
 
-export type PollOption = { id: string; label: string; votes: number }
+export type PollOption = {
+  id: string
+  label: string
+  label_hi?: string | null
+  votes: number
+}
 export type ActivePoll = {
   id: string
   question: string
+  question_hi?: string | null
   closes_at: string | null
   options: PollOption[]
   total: number

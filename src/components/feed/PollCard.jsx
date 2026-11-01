@@ -9,7 +9,8 @@ import { useI18n } from '@/lib/i18n'
  * implying a live count.
  */
 export function PollCard({ poll }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  const labelOf = (option) => (lang === 'hi' && option.label_hi ? option.label_hi : option.label)
   const [voted, setVoted] = useState(null)
   const headingId = `poll-${poll.id}`
 
@@ -40,7 +41,7 @@ export function PollCard({ poll }) {
               onClick={() => setVoted(option.id)}
               className="flex h-11 items-center justify-center border border-coral-300 px-3 text-sm text-cream-100 transition-colors duration-[var(--motion-base)] hover:bg-brown-700 focus-visible:ring-[3px] focus-visible:ring-teal-400 focus-visible:outline-none"
             >
-              {option.label}
+              {labelOf(option)}
             </button>
           ))}
         </div>
@@ -54,7 +55,7 @@ export function PollCard({ poll }) {
                 <li key={option.id}>
                   <div className="flex items-baseline justify-between gap-3 text-[12px] text-cream-100">
                     <span>
-                      {option.label}
+                      {labelOf(option)}
                       {voted === option.id ? ' (your vote)' : ''}
                     </span>
                     <span>{percent}%</span>

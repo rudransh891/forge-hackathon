@@ -577,13 +577,13 @@ class VoteBody(BaseModel):
 
 def _poll_payload(conn, poll_id) -> dict | None:
     row = conn.execute(
-        text("select id, question, closes_at from polls where id = :i"), {"i": poll_id}
+        text("select id, question, question_hi, closes_at from polls where id = :i"), {"i": poll_id}
     ).mappings().first()
     if row is None:
         return None
     options = conn.execute(
         text(
-            "select o.id, o.label, "
+            "select o.id, o.label, o.label_hi, "
             "       (select count(*) from poll_votes v where v.option_id = o.id) as votes "
             "from poll_options o where o.poll_id = :p order by o.ordinal, o.label"
         ),
@@ -592,9 +592,15 @@ def _poll_payload(conn, poll_id) -> dict | None:
     return {
         "id": str(row["id"]),
         "question": row["question"],
+        "question_hi": row["question_hi"],
         "closes_at": row["closes_at"].isoformat() if row["closes_at"] else None,
         "options": [
-            {"id": str(option["id"]), "label": option["label"], "votes": option["votes"]}
+            {
+                "id": str(option["id"]),
+                "label": option["label"],
+                "label_hi": option["label_hi"],
+                "votes": option["votes"],
+            }
             for option in options
         ],
         "total": sum(option["votes"] for option in options),

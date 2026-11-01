@@ -5,7 +5,7 @@ import {
   subscribe,
   toggleSupport,
 } from '@/components/report/reportStore'
-import { copy } from './formConfig'
+import { useCopy } from './formConfig'
 
 function SearchIcon() {
   return (
@@ -22,6 +22,7 @@ function SearchIcon() {
  * the same support there.
  */
 export function NearbyCheck({ reports, onView, onStillPost }) {
+  const copy = useCopy()
   const store = useSyncExternalStore(subscribe, getSnapshot)
   const [supported, setSupported] = useState(null)
 
