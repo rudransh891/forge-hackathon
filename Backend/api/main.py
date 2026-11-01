@@ -190,6 +190,12 @@ async def lifespan(app):
 
 
 app = FastAPI(title="FixIt Bharat", lifespan=lifespan)
+
+# Preview deployments get a new hostname on every push, so an exact origin list is
+# not enough for them. CORS_ORIGIN_REGEX covers a whole domain (for example
+# `https://.*\.vercel\.app`); CORS_ORIGINS still lists exact origins.
+_origin_regex = os.getenv("CORS_ORIGIN_REGEX", "").strip() or None
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -197,6 +203,7 @@ app.add_middleware(
         for origin in os.getenv("CORS_ORIGINS", DEFAULT_CORS_ORIGINS).split(",")
         if origin.strip()
     ],
+    allow_origin_regex=_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

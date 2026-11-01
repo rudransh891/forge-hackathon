@@ -10,7 +10,20 @@
  * vite.config.ts). Uploaded photos are served from `/uploads`, proxied the same way.
  */
 
-export const API_BASE = '/api'
+/**
+ * Locally the Vite proxy answers `/api`. A static host has no backend, so a
+ * deployment sets `VITE_API_BASE` to the URL of the running API instead.
+ */
+const configuredBase = import.meta.env.VITE_API_BASE as string | undefined
+
+export const API_BASE = (configuredBase && configuredBase.replace(/\/+$/, '')) || '/api'
+
+/**
+ * Uploaded photos are served by the API, not by the static host. In development
+ * the Vite proxy handles `/uploads`; a deployment has to send them to the API
+ * origin, or every photo 404s on the deployed domain.
+ */
+const UPLOADS_BASE = configuredBase ? `${API_BASE}/uploads` : '/uploads'
 
 /** Backend issue types, from Backend/ai/schemas.py. */
 export type IssueType =
@@ -404,7 +417,7 @@ function uiStatus(status: string): UiStatus {
 export function photoUrl(photoPath: string | null | undefined): string | null {
   if (!photoPath) return null
   const name = photoPath.split(/[\\/]/).pop()
-  return name ? `/uploads/${name}` : null
+  return name ? `${UPLOADS_BASE}/${name}` : null
 }
 
 export function formatCoords(lat: number, lng: number): string {

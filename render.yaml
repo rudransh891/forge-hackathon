@@ -1,0 +1,58 @@
+# Render blueprint for the FixItBharat API.
+#
+# Region is Ohio (us-east-2) on purpose: the Neon database lives there, and every
+# query currently crosses an ocean from Prayagraj.
+#
+# The disk is mounted *inside* the repo directory because the code resolves photos
+# with a relative path `uploads/` from four modules. Mounting at /var/data would
+# need the code changed; mounting here needs nothing.
+
+services:
+  - type: web
+    name: fixitbharat-api
+    runtime: python
+    region: ohio
+    plan: starter
+    rootDir: Backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/Backend/uploads
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+
+      # Set these in the dashboard. `sync: false` means Render prompts for the
+      # value instead of storing it in this file.
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_VISION_MODEL
+        sync: false
+      - key: FIREBASE_API_KEY
+        sync: false
+      - key: NOMINATIM_CONTACT
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: ROUTING_TEST_RECIPIENT
+        sync: false
+      - key: DEPARTMENT_KEY
+        sync: false
+
+      # The deployed frontend. Replace with your Vercel domain.
+      - key: CORS_ORIGINS
+        value: https://your-app.vercel.app,http://localhost:5174
+      - key: CORS_ORIGIN_REGEX
+        value: https://.*\.vercel\.app
