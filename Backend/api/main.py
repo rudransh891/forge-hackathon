@@ -48,6 +48,13 @@ DEFAULT_CORS_ORIGINS = (
 # survivor already represents them.
 HIDDEN_FROM_FEED = ("merged",)
 
+# What the public board refuses to show: reports whose *input* was not usable —
+# a photo we could not read as a civic issue, or a duplicate. Everything else is
+# published, including reports still waiting for analysis and reports where our
+# own pipeline failed (needs_review), because those are real civic issues and the
+# failure is ours, not the citizen's.
+FEED_EXCLUDED = ("merged", "needs_better_photo")
+
 SEVERITY_ORDER = (
     "case severity_level when 'critical' then 4 when 'high' then 3 "
     "when 'medium' then 2 when 'low' then 1 else 0 end"
@@ -655,6 +662,104 @@ def cast_vote(poll_id: str, body: VoteBody):
     return payload
 
 
+class StatusUpdate(BaseModel):
+    status: str
+    note: str = ""
+
+
+# There is no department account system. A shared key in the backend env is the
+# whole of the access control, and it is the honest limit of a pilot: it stops the
+# endpoint being an anonymous write, it does not prove who is on the other end.
+DEPARTMENT_KEY = os.getenv("DEPARTMENT_KEY", "demo")
+ALLOWED_STATUSES = {"acknowledged", "in_progress", "resolved", "reopened"}
+
+
+def _require_department(key: str | None) -> None:
+    if not key or key != DEPARTMENT_KEY:
+        raise HTTPException(status_code=401, detail="Department key is not valid.")
+
+
+@app.get("/department/queue")
+def department_queue(
+    x_department_key: str | None = Header(default=None),
+    limit: int = 50,
+):
+    """Routed reports waiting on a body, overdue first."""
+    _require_department(x_department_key)
+    limit = max(1, min(limit, 200))
+
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text(
+                "select id, created_at, issue_type, severity_level, status, deadline_at, "
+                "       address, department "
+                "from reports "
+                "where status not in ('merged', 'needs_better_photo', 'received', 'needs_review') "
+                "order by (deadline_at is not null and deadline_at < now()) desc, "
+                "         deadline_at nulls last, created_at desc "
+                "limit :n"
+            ),
+            {"n": limit},
+        ).mappings().all()
+
+    return {"items": [{**dict(row), "id": str(row["id"])} for row in rows]}
+
+
+@app.patch("/reports/{report_id}/status")
+def set_report_status(
+    report_id: str,
+    payload: StatusUpdate,
+    x_department_key: str | None = Header(default=None),
+):
+    """A department moves the complaint. The change is stored on the timeline with
+    an author, so the public board shows who moved it."""
+    _require_department(x_department_key)
+
+    try:
+        rid = uuid.UUID(report_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid report id.")
+
+    wanted = (payload.status or "").strip().lower()
+    if wanted not in ALLOWED_STATUSES:
+        raise HTTPException(
+            status_code=422,
+            detail="Status must be acknowledged, in_progress, resolved or reopened.",
+        )
+
+    # A reopened complaint goes back to the routed state: it has been sent, and the
+    # fix did not hold.
+    new_status = "routed" if wanted == "reopened" else wanted
+
+    with engine.begin() as conn:
+        row = conn.execute(
+            text("select status from reports where id = :i for update"), {"i": rid}
+        ).first()
+        if row is None:
+            raise HTTPException(status_code=404, detail="Report not found.")
+        if row.status == "merged":
+            raise HTTPException(status_code=409, detail="That report was merged into another.")
+
+        conn.execute(
+            text(
+                "update reports set status = :s, "
+                "resolved_at = case when :s = 'resolved' then now() else null end "
+                "where id = :i"
+            ),
+            {"s": new_status, "i": rid},
+        )
+        note = (payload.note or "").strip()[:500] or new_status.replace("_", " ")
+        conn.execute(
+            text(
+                "insert into status_events (report_id, status, note) "
+                "values (:i, :s, :n)"
+            ),
+            {"i": rid, "s": new_status, "n": f"Department: {note}"},
+        )
+
+    return {"id": str(rid), "status": new_status}
+
+
 @app.get("/feed")
 def feed(
     issue_type: str | None = None,
@@ -677,8 +782,11 @@ def feed(
     types = [t.strip() for t in (issue_type or "").split(",") if t.strip()]
 
     params: dict = {"lim": limit, "off": offset}
-    clauses = ["status <> ALL(:hidden)"]
-    params["hidden"] = list(HIDDEN_FROM_FEED)
+    clauses = [
+        "status <> ALL(:hidden)",
+        "coalesce(issue_type, '') <> 'none'",
+    ]
+    params["hidden"] = list(FEED_EXCLUDED)
     if types:
         clauses.append("issue_type = ANY(:types)")
         params["types"] = types

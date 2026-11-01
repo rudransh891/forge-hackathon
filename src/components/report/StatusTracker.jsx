@@ -4,7 +4,31 @@ import { useI18n } from '@/lib/i18n'
 
 const ORDER = trackerSteps.map((step) => step.id)
 
+/**
+ * A department moves a report through its own vocabulary. The tracker speaks in
+ * four steps, so every status has to land on one of them or the rail resets to
+ * nothing after a status change.
+ */
+const STATUS_TO_STEP = {
+  received: 'reported',
+  analysed: 'reported',
+  needs_review: 'reported',
+  needs_better_photo: 'reported',
+  merged: 'reported',
+  routed: 'routed',
+  reopened: 'routed',
+  acknowledged: 'scheduled',
+  in_progress: 'scheduled',
+  escalated: 'scheduled',
+  resolved: 'fixed',
+}
+
+export function stepOf(status) {
+  return STATUS_TO_STEP[status] ?? status
+}
+
 export function stepState(stepId, currentId) {
+  currentId = stepOf(currentId)
   const stepIndex = ORDER.indexOf(stepId)
   const currentIndex = ORDER.indexOf(currentId)
   if (stepIndex < 0 || currentIndex < 0) return 'upcoming'
@@ -47,12 +71,13 @@ function labelClass(state) {
 /** Mobile tracker: four dots on a rail with the labels underneath. */
 export function TrackerHorizontal({ current, dates = {} }) {
   const { t } = useI18n()
+  const currentId = stepOf(current)
   return (
     <ol aria-label={t('tracker.progress')} className="grid grid-cols-4 gap-0">
       {trackerSteps.map((step, index) => {
-        const state = stepState(step.id, current)
+        const state = stepState(step.id, currentId)
         const isFixed = step.id === 'fixed'
-        const segmentDone = ORDER.indexOf(step.id) < ORDER.indexOf(current)
+        const segmentDone = ORDER.indexOf(step.id) < ORDER.indexOf(currentId)
         return (
           <li
             key={step.id}
@@ -95,12 +120,13 @@ export function TrackerHorizontal({ current, dates = {} }) {
 /** Desktop tracker: dots down the left, labels and dates to the right. */
 export function TrackerVertical({ current, dates = {} }) {
   const { t } = useI18n()
+  const currentId = stepOf(current)
   return (
     <ol aria-label={t('tracker.progress')} className="flex flex-col">
       {trackerSteps.map((step, index) => {
-        const state = stepState(step.id, current)
+        const state = stepState(step.id, currentId)
         const isFixed = step.id === 'fixed'
-        const segmentDone = ORDER.indexOf(step.id) < ORDER.indexOf(current)
+        const segmentDone = ORDER.indexOf(step.id) < ORDER.indexOf(currentId)
         return (
           <li
             key={step.id}

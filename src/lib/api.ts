@@ -270,7 +270,10 @@ const getCache = new Map<string, { at: number; value: unknown }>()
 
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const method = (init.method ?? 'GET').toUpperCase()
-  const cacheable = method === 'GET' && init.body === undefined
+  // Reports change under the reader's feet when a department moves one, so they
+  // are never served from the client cache.
+  const cacheable =
+    method === 'GET' && init.body === undefined && !path.startsWith('/reports/')
 
   if (cacheable) {
     const hit = getCache.get(path)
@@ -771,6 +774,41 @@ export function deadlineLabel(iso: string | null): string | null {
 
 /* ------------------------------------------------------------- departments */
 
+export type DepartmentQueueItem = {
+  id: string
+  created_at: string
+  issue_type: string | null
+  severity_level: string | null
+  status: string
+  deadline_at: string | null
+  address: string | null
+  department: string | null
+}
+
+/** The routed reports waiting on a body, overdue first. Key-gated. */
+export async function fetchDepartmentQueue(key: string): Promise<DepartmentQueueItem[]> {
+  const data = await apiFetch<{ items: DepartmentQueueItem[] }>('/department/queue', {
+    headers: { 'X-Department-Key': key },
+  })
+  return data.items
+}
+
+export type DepartmentStatus = 'acknowledged' | 'in_progress' | 'resolved' | 'reopened'
+
+/** Records a status change with a note on the report's timeline. */
+export async function setDepartmentStatus(
+  key: string,
+  id: string,
+  status: DepartmentStatus,
+  note: string,
+): Promise<{ id: string; status: string }> {
+  return apiFetch<{ id: string; status: string }>(`/reports/${encodeURIComponent(id)}/status`, {
+    method: 'PATCH',
+    headers: { 'X-Department-Key': key },
+    body: JSON.stringify({ status, note }),
+  })
+}
+
 /** Resolution speed and backlog per responsible body, from real rows only. */
 export async function fetchDepartments(): Promise<DepartmentRow[]> {
   const data = await apiFetch<{ items: DepartmentRow[] }>('/departments')
@@ -825,8 +863,7 @@ export async function fetchCommentsFor(
   )
 }
 
-export async function postCommentTo(
-  id: string,
+export async function postCommentTo(  id: string,
   body: string,
   idToken?: string | null,
 ): Promise<CommentRow> {

@@ -27,6 +27,20 @@ export function StatusTag({ status, urgent }) {
       </span>
     )
   }
+  if (status === 'in_progress') {
+    return (
+      <span className="inline-flex h-6 items-center gap-1.5 bg-teal-400 px-2 text-[12px] font-semibold text-brown-900">
+        {t('status.inProgress')}
+      </span>
+    )
+  }
+  if (status === 'acknowledged') {
+    return (
+      <span className="inline-flex h-6 items-center gap-1.5 bg-sand-300 px-2 text-[12px] font-semibold text-brown-900">
+        {t('status.acknowledged')}
+      </span>
+    )
+  }
   if (status === 'merged') {
     return (
       <span className="inline-flex h-6 items-center gap-1.5 bg-sand-100 px-2 text-[12px] font-semibold text-brown-900">

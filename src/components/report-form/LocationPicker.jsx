@@ -23,7 +23,13 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [active, setActive] = useState(-1)
-  const [coords, setCoords] = useState(null)
+  const [coords, setCoords] = useState(() => {
+    // A restored draft already carries its point when it has one.
+    if (location && typeof location.lat === 'number' && typeof location.lng === 'number') {
+      return { lat: location.lat, lng: location.lng }
+    }
+    return null
+  })
   const reverseTimer = useRef(null)
 
   useEffect(
@@ -40,6 +46,15 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
    */
   useEffect(() => {
     if (!location || coords) return undefined
+
+    // The point may have survived with the draft; if so, adopt it silently.
+    if (typeof location.lat === 'number' && typeof location.lng === 'number') {
+      const next = { lat: location.lat, lng: location.lng }
+      setCoords(next)
+      onCoords(next)
+      return undefined
+    }
+
     let alive = true
     searchPlaces(location.blockLabel).then((results) => {
       if (!alive || results.length === 0) return
@@ -52,7 +67,7 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
       alive = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location?.blockLabel])
+  }, [location?.blockLabel, location?.lat, location?.lng])
 
   const remember = (next) => {
     setCoords(next)
@@ -110,7 +125,13 @@ export function LocationPicker({ location, onLocation, onCoords, error, announce
 
   const choose = (place) => {
     remember({ lat: place.lat, lng: place.lng })
-    onLocation({ blockLabel: place.blockLabel, locality: place.locality, approximate: true })
+    onLocation({
+      blockLabel: place.blockLabel,
+      locality: place.locality,
+      approximate: true,
+      lat: place.lat,
+      lng: place.lng,
+    })
     setSuggestions([])
     setMessage('')
     announce(`Location set to ${place.blockLabel}`)

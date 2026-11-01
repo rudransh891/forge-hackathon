@@ -1,4 +1,4 @@
-﻿import os
+import os
 
 from dotenv import load_dotenv
 
@@ -31,6 +31,8 @@ def get_model_chain() -> list[str]:
     return chain
 
 
-REQUEST_TIMEOUT_SECONDS = float(os.getenv("OPENROUTER_TIMEOUT_SECONDS", "60"))
+# Short on purpose: a slow or rate-limited model should fall through to the next
+# one rather than hold a report for a minute. The fallback chain is the safety net.
+REQUEST_TIMEOUT_SECONDS = float(os.getenv("OPENROUTER_TIMEOUT_SECONDS", "20"))
 
 MAX_OUTPUT_TOKENS = int(os.getenv("OPENROUTER_MAX_OUTPUT_TOKENS", "3000"))

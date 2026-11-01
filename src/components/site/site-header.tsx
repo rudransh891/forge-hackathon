@@ -8,6 +8,7 @@ const LINKS = [
   { href: '#how-it-works', key: 'nav.howItWorks' },
   { href: '#/issues', key: 'nav.issues' },
   { href: '#/submit', key: 'nav.report' },
+  { href: '#/department', key: 'nav.department' },
   { href: '#polls', key: 'nav.polls' },
   { href: '#faq', key: 'nav.faq' },
   { href: '#about', key: 'nav.about' },

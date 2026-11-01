@@ -1,4 +1,4 @@
-﻿"""One-sentence severity explanation written by the LLM, then verified by code.
+"""One-sentence severity explanation written by the LLM, then verified by code.
 Returns None if no model produces a sentence that passes the checks."""
 import json
 import logging
@@ -10,7 +10,7 @@ from ai.config import OPENROUTER_BASE_URL, MAX_OUTPUT_TOKENS, get_api_key, get_m
 
 log = logging.getLogger("fixit.severity_reason")
 
-LLM_TIMEOUT_SECONDS = 30.0
+LLM_TIMEOUT_SECONDS = 12.0
 MAX_CHARS = 300
 NUM = re.compile(r"\d+(?:\.\d+)?")
 LEVEL_WORDS = {"low", "medium", "high", "critical"}

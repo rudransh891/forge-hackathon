@@ -139,7 +139,12 @@ export function ReportFormPage() {
       locality: current.location.locality,
       safetyHazard: current.safetyHazard,
       photos: current.photos,
-      coords: coordsRef.current,
+      coords:
+        coordsRef.current ??
+        (typeof current.location?.lat === 'number' &&
+        typeof current.location?.lng === 'number'
+          ? { lat: current.location.lat, lng: current.location.lng }
+          : null),
       audioText: dictated,
       idToken: await getIdToken(),
     })
@@ -152,7 +157,7 @@ export function ReportFormPage() {
     if (result.status === 'manual_location') {
       setBanner({
         kind: 'info',
-        text: 'Posting from a typed location is not connected yet. Use your location, or pick a block from the suggestions.',
+        text: 'Tap the map to confirm where this is, then post again.',
       })
       setStatus('idle')
       return

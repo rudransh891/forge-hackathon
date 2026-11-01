@@ -24,6 +24,7 @@ const STRINGS = {
     'nav.howItWorks': 'How it works',
     'nav.issues': 'Issues',
     'nav.report': 'Report',
+    'nav.department': 'Department',
     'nav.polls': 'Polls',
     'nav.faq': 'FAQ',
     'nav.about': 'About',
@@ -151,6 +152,8 @@ const STRINGS = {
 
     'status.urgent': 'Urgent',
     'status.resolved': 'Resolved',
+    'status.acknowledged': 'Acknowledged',
+    'status.inProgress': 'In progress',
     'status.duplicate': 'Duplicate',
     'status.needsPhoto': 'Needs a clear photo',
     'status.underReview': 'Under review',
@@ -327,6 +330,7 @@ const STRINGS = {
     'nav.howItWorks': 'यह कैसे काम करता है',
     'nav.issues': 'समस्याएँ',
     'nav.report': 'रिपोर्ट करें',
+    'nav.department': 'विभाग',
     'nav.polls': 'मतदान',
     'nav.faq': 'सामान्य प्रश्न',
     'nav.about': 'परिचय',
@@ -453,6 +457,8 @@ const STRINGS = {
 
     'status.urgent': 'अत्यावश्यक',
     'status.resolved': 'हल हुई',
+    'status.acknowledged': 'स्वीकार किया',
+    'status.inProgress': 'कार्य जारी',
     'status.duplicate': 'दोहराव',
     'status.needsPhoto': 'साफ़ फ़ोटो चाहिए',
     'status.underReview': 'जाँच में',

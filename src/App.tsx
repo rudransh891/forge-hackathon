@@ -15,6 +15,7 @@ import { I18nProvider } from '@/lib/i18n'
 import { FeedPage } from '@/components/feed/FeedPage'
 import { ReportPage } from '@/components/report/ReportPage'
 import { ReportFormPage } from '@/components/report-form/ReportFormPage'
+import { DepartmentPage } from '@/components/department/DepartmentPage'
 import { feedNavigation } from '@/components/report/feedNavigation'
 
 /**
@@ -44,6 +45,7 @@ function App() {
   const reportId = reportMatch ? reportMatch[1] : null
   const showFeed = hash === '#/issues'
   const showSubmit = hash === '#/submit' || hash === '#/report/new'
+  const showDepartment = hash === '#/department'
 
   return (
     <I18nProvider>
@@ -66,6 +68,8 @@ function App() {
 
       {reportId ? (
         <ReportPage key={reportId} id={reportId} />
+      ) : showDepartment ? (
+        <DepartmentPage />
       ) : showFeed ? (
         <FeedPage />
       ) : showSubmit ? (

@@ -51,7 +51,7 @@ export function Faq() {
           {FAQS.map((_item, index) => (
             <details
               key={index}
-              className="group border-b border-sand-300 py-5 open:border-b-2 open:border-b-brown-900 open:bg-cream-50 [&_summary::-webkit-details-marker]:hidden"
+              className="group list-none border-b border-sand-300 py-5 open:border-b-2 open:border-b-brown-900 [&_summary::-webkit-details-marker]:hidden [&_summary]:outline-none [&_summary:focus-visible]:outline-2 [&_summary:focus-visible]:outline-offset-2 [&_summary:focus-visible]:outline-[var(--focus-ring)]"
             >
               <summary className="flex list-none cursor-pointer items-center justify-between gap-6 font-sans text-lg font-semibold text-brown-900">
                 {t(`faq.q${index + 1}`)}

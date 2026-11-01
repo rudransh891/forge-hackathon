@@ -495,6 +495,7 @@ function EvidencePanel({ report }) {
 }
 
 export function ReportPage({ id }) {
+  const { t } = useI18n()
   const [report, setReport] = useState(null)
   const [nearby, setNearby] = useState([])
   const [status, setStatus] = useState('loading')
